@@ -26,11 +26,11 @@
   "input": {
     "cursor": "visible"
   },
-  "platform": "web",
+  "platform": "android",
   "product": {
     "company": "",
     "copyright": "",
-    "icon": "",
+    "icon": "C:\\Users\\ucogl\\Downloads\\Promo\\icono-1024.png",
     "name": "Gravitational",
     "version": "1.0.0"
   },
