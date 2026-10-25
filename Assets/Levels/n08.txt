@@ -1,24 +1,34 @@
-; NIVEL 08 - LA OLA: la rampa (24/10/2026, hecho a mano)
+; NIVEL 08 - LA OLA: la rampa (24/10/2026, hecho a mano; rehecho por la
+; dificultad el mismo dia: de 2 piezas a 4).
 ;
 ; Una franja baja, y una pared que flota SIN tocarla: la luz del piso no puede
 ; subir a ella (no hay arista). La rampa si: levanta la luz del piso a la
-; pared. Arriba la pared se pliega en un estante alto, y del borde lejano del
-; estante cuelga la llegada: la luz sube, cruza y baja, como una ola. El
-; receptor queda al costado de donde baja: una piramide apoyada en la llegada
-; (un plano vertical) la dobla.
+; pared. Arriba la pared se pliega en un estante, y a mitad de la ola hay un
+; ESCALON: un segundo estante mas alto, sin arista entre los dos. La cuna sube
+; la luz a el. Del borde lejano cuelga la llegada, y en la columna por la que
+; la luz baja derecho espera un agujero negro.
+;
+; El receptor esta en la esquina de abajo y del fondo: la luz tiene que correrse
+; de costado en algun momento, y las dos piramides lo hacen en cualquiera de
+; tres planos (la pared, el estante bajo o la llegada misma). La decision es
+; DONDE doblar, y cada sitio pide las piramides en otra postura.
 title THE WAVE
 hint THE RAMP LIFTS LIGHT FROM THE FLOOR TO A WALL THAT DOES NOT TOUCH IT
 rules 3
-size 9 7 4
-start floor 0 0 0 3 0 3
+size 10 8 5
+start floor 0 0 0 3 0 1
 source 0 0 1 right
 panel right 3 1 0 3 4 3
-panel floor 4 5 0 7 5 3
-end left 8 1 0 8 4 3
-receiver 8 1 3
-inventory ramp 1 pyramid 1 sphere 1
+panel floor 4 5 0 5 5 3
+panel floor 6 6 0 8 6 3
+end left 9 1 0 9 5 4
+fixed blackhole 9 4 1 right
+receiver 9 1 4
+inventory ramp 1 prism 1 pyramid 2 sphere 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
 ;! place ramp 2 0 1 right up
-;! place pyramid 8 1 1 right
+;! place prism 5 5 1 right down
+;! place pyramid 9 5 1 right
+;! place pyramid 9 5 4 left

@@ -48,7 +48,7 @@ struct Invariant {
 // solucion que no se ve entera. Las de D2-D4 son firmes desde la Fase 2
 // (24/10/2026): `levellab probe` las dejo en cero en 13.580 recorridos.
 inline const Invariant kInvariants[] = {
-    {"dibujo", "cada superficie recibe como mucho kDrawSlots tramos (los demas no se dibujan)", 3, true},
+    {"dibujo", "cada pieza recibe como mucho kDrawSlots tramos, y cada plano kPlaneDrawSlots (los demas no se dibujan)", 3, true},
     {"continuidad", "un tramo empieza donde termino el anterior (arista con arista, centro con centro)", 0, true},
     {"por-debajo", "D2: la luz del plano no entra (ni sale) por una cara ENTERA apoyada: sube por la de enfrente o se frena en ella", 0, true},
     {"frena-debajo", "D2: la luz que se frena contra una pieza se frena en su borde, no debajo de ella", 0, true},
@@ -79,7 +79,7 @@ inline std::vector<Violation> CheckTrace(const Board& b, const Trace& t) {
         else ++perFigure[b.IndexAt(h.cell)];
     }
     for (const auto& [plane, n] : perPlane)
-        if (n > kDrawSlots) out.push_back({"dibujo", "plano " + std::to_string(plane) + " tiene " + std::to_string(n) + " tramos"});
+        if (n > kPlaneDrawSlots) out.push_back({"dibujo", "plano " + std::to_string(plane) + " tiene " + std::to_string(n) + " tramos"});
     for (const auto& [index, n] : perFigure)
         if (index >= 0 && n > kDrawSlots)
             out.push_back({"dibujo", std::string(Info(b.figures[static_cast<size_t>(index)].shape).key) + " " +

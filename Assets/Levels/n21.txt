@@ -1,27 +1,45 @@
-; NIVEL 21 - LA ESPIRAL (24/10/2026, hecho a mano)
+; NIVEL 21 - LA ESPIRAL (24/10/2026, hecho a mano; rehecho por la dificultad el
+; mismo dia: de 6 piezas a 14, y ahora son SEIS estantes).
 ;
-; Cuatro estantes alrededor de una columna vacia, cada uno un escalon mas alto y
-; en otro cuadrante: una escalera de caracol de dimensiones. En cada esquina la
-; luz necesita una CUNA para subir al estante siguiente y una PIRAMIDE para
-; girar hacia el - y a veces la piramide le entrega la luz directo a la cuna.
+; Seis estantes en anillo, cada uno una casilla mas alto que el anterior y al
+; lado del anterior: la luz sube dando la vuelta. NINGUNO queda encima de otro,
+; a proposito: la primera version los apilaba en caracol (el quinto sobre el
+; primero) y una torre de seis piezas subia derecho del uno al otro.
+;
+; En cada estante la luz tiene que girar o correrse de fila, y despues SUBIR al
+; siguiente. Subir es casi siempre una cuna con la pendiente hacia la luz; una
+; vez es un cubo, que la sube por encima y la deja a ras en el estante de arriba
+; (con la franja a lo largo de la luz es una tapa y la frena). Correrse de fila
+; son dos piramides seguidas, la de base y la de punta; en una esquina gira un
+; par esfera + cubo (la esfera la tira al cubo de al lado, y el cubo la deja del
+; otro lado). Arriba de todo, la llegada se levanta en el borde del ultimo.
 title THE SPIRAL
 hint CLIMB AND TURN, CLIMB AND TURN
 rules 3
-size 7 8 7
-start floor 0 0 0 2 0 2
-source 0 0 1 right
-panel floor 3 1 0 6 1 2
-panel floor 4 2 3 6 2 6
-panel floor 0 3 4 3 3 6
-end front 0 3 4 3 6 4
-receiver 1 6 4
-inventory prism 3 pyramid 3 sphere 1
+size 12 10 12
+start floor 0 0 0 3 0 3
+source 1 0 3 front
+panel floor 4 1 0 7 1 3
+panel floor 8 2 0 11 2 5
+panel floor 7 3 6 11 3 9
+panel floor 3 4 5 6 4 9
+panel floor 0 5 5 2 5 9
+end front 0 5 5 2 8 5
+receiver 1 8 5
+inventory prism 4 pyramid 7 cube 2 sphere 1 torus 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
-;! minimal
-;! place prism 2 0 1 down right
+;! place pyramid 1 0 1 up
+;! place prism 3 0 1 right down
 ;! place pyramid 5 1 1 up
-;! place prism 5 1 2 down back
-;! place pyramid 5 2 5 up
-;! place prism 4 2 5 down left
-;! place pyramid 1 3 5 up
+;! place pyramid 5 1 2 down
+;! place prism 7 1 2 right down
+;! place sphere 9 2 2
+;! place cube 9 2 3 x
+;! place prism 9 2 5 back down
+;! place pyramid 9 3 7 up
+;! place cube 7 3 7 z
+;! place pyramid 5 4 7 up
+;! place pyramid 5 4 6 down
+;! place prism 3 4 6 left down
+;! place pyramid 1 5 6 up

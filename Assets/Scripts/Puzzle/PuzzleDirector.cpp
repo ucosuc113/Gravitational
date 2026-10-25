@@ -71,15 +71,12 @@ public:
     ObjectField startPlane{this, "startPlane"};
     ObjectField endPlane{this, "endPlane"};
     ObjectField figures{this, "figures"};
-    // El HUD viejo de la escena (botones). Si esta, se apaga: lo reemplaza GameHud.
-    ObjectField hud{this, "hud"};
 
     void OnStart() override {
         const char* required[] = {"startPlane", "endPlane", "figures"};
         const ObjectField* fields[] = {&startPlane, &endPlane, &figures};
         for (int i = 0; i < 3; ++i)
             if (!fields[i]->Get()) Log::Warn(L"PuzzleDirector: falta el campo '" + Utf8ToWide(required[i]) + L"' en el Inspector");
-        if (GameObject* old = hud.Get()) old->active = false;
         WarnIfMenuIsOff();
         m_levelIndex = 0;
         PublishLevels();

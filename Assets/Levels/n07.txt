@@ -1,23 +1,28 @@
-; NIVEL 07 - LA ESCALERA: la cuna (24/10/2026, hecho a mano)
+; NIVEL 07 - LA ESCALERA: la cuna (24/10/2026, hecho a mano; rehecho por la
+; dificultad el mismo dia: de 2 piezas a 3).
 ;
-; Tres planos flotan escalonados, cada uno mas alto y mas adelante, y entre uno
+; Tres planos flotan escalonados, cada uno mas alto que el anterior, y entre uno
 ; y el siguiente no hay arista: la luz se pierde en cada borde. La cuna, con la
 ; pendiente de cara a la luz, la sube al plano de arriba (a ras: la punta de la
-; pendiente toca el borde del siguiente). Dos cunas, dos escalones; girada al
-; reves, la luz pasa por encima y cae.
+; pendiente toca el borde del siguiente). El tercer escalon esta CORRIDO hacia
+; el fondo: la luz que sube derecho del primero al segundo lo pasa de largo.
+; Hay que doblarla en el segundo (la piramide) y recien ahi subirla con la otra
+; cuna, que ahora mira para otro lado. Girada al reves, la luz pasa por encima y
+; cae.
 title THE STAIRS
 hint THE WEDGE LIFTS LIGHT TO THE PLANE ABOVE, IF ITS SLOPE FACES THE LIGHT
 rules 3
-size 9 5 4
+size 9 5 6
 start floor 0 0 0 2 0 3
 source 0 0 1 right
 panel floor 3 1 0 5 1 3
-panel floor 6 2 0 8 2 3
-end right 8 2 0 8 4 3
-receiver 8 4 1
-inventory prism 2 sphere 1
+panel floor 3 2 4 5 2 5
+end back 3 2 5 5 4 5
+receiver 4 4 5
+inventory prism 2 pyramid 1 sphere 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
-;! place prism 2 0 1 down right
-;! place prism 5 1 1 down right
+;! place prism 2 0 1 right down
+;! place pyramid 4 1 1 up
+;! place prism 4 1 3 back down

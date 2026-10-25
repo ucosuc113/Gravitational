@@ -1,25 +1,43 @@
-; NIVEL 14 - LO QUE VUELVE: el agujero blanco (24/10/2026, hecho a mano)
+; NIVEL 14 - LO QUE VUELVE: el agujero blanco (24/10/2026, hecho a mano; rehecho
+; por la dificultad el mismo dia: de 1 pieza a 6).
 ;
 ; La llegada esta DETRAS de la fuente, y la luz nace mirando para el otro lado.
 ; Al fondo de la franja, un agujero blanco la devuelve por donde vino - y la luz
 ; que vuelve choca con la fuente. Una cuna hace que la vuelta sea otro camino: a
 ; la ida la luz la encuentra por su lado recto y pasa por encima; a la vuelta la
 ; encuentra por la pendiente, sube, y sigue a ras por un estante que flota sobre
-; el piso, por encima de la fuente, hasta la llegada. La franja de la fuente y
-; la del agujero son dos planos a ras: cada uno lleva a lo sumo dos tramos.
+; la fuente.
+;
+; Lo que se agrego: la vuelta tiene que subir DOS alturas mas. Un cubo en el
+; estante la sube al siguiente (su franja de costado: con el eje a lo largo de la
+; luz es una tapa y la frena), y una rampa la levanta a una pared alta que no
+; toca ese estante. En la pared hay que llevarla a la llegada, que se levanta en
+; su borde del fondo, y el receptor esta ARRIBA y en la otra punta: la esfera
+; tira la luz de costado a un segundo cubo, que la dobla hacia el fondo, y una
+; piramide de punta la sube por la llegada.
 title WHAT COMES BACK
 hint THE WHITE HOLE SENDS LIGHT BACK. THE WAY BACK NEED NOT BE THE WAY THERE
 rules 3
-size 9 4 3
-start floor 3 0 1 4 0 1
-source 3 0 1 right
-panel floor 5 0 1 8 0 1
-fixed whitehole 8 0 1
-panel floor 0 1 1 4 1 1
-end left 0 1 0 0 3 2
-receiver 0 3 1
-inventory prism 1 sphere 1
+size 10 7 5
+start floor 3 0 2 4 0 2
+source 3 0 2 right
+panel floor 5 0 2 9 0 2
+fixed whitehole 9 0 2
+panel floor 2 1 2 4 1 2
+panel floor 0 2 2 1 2 2
+panel left 0 3 0 0 6 3
+end back 0 3 4 4 6 4
+receiver 4 6 4
+fixed blackhole 4 5 4 front
+fixed blackhole 3 5 4 front
+fixed blackhole 2 5 4 front
+inventory prism 1 cube 2 ramp 1 sphere 1 pyramid 2
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
-;! place prism 5 0 1 down left
+;! place prism 5 0 2 down left
+;! place cube 2 1 2 z
+;! place ramp 1 2 2 left up
+;! place sphere 0 6 2
+;! place cube 0 6 3 -x
+;! place pyramid 0 6 4 back

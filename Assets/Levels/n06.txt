@@ -8,7 +8,11 @@
 ;      cae en un estante que flota del otro lado (sin piezas: los planos se
 ;      pliegan);
 ;   3. en el estante la luz va hacia el fondo y se pierde; una PIRAMIDE la
-;      dobla, y por el borde del estante sube al plano de llegada.
+;      dobla, y por el borde del estante sube al plano de llegada;
+;   4. (24/10/2026, dificultad) el receptor esta en la OTRA punta de la
+;      llegada: la luz sube derecho y se pierde arriba, y una segunda piramide,
+;      apoyada en el plano vertical, la dobla hacia el. Dos piramides, dos
+;      posturas distintas: una sobre un piso y otra sobre una pared.
 title THE FOLD
 hint EACH PLANE IS A DIMENSION. LIGHT CROSSES FROM ONE TO ANOTHER AT THEIR EDGES
 rules 3
@@ -22,10 +26,11 @@ panel back 2 0 1 5 3 1
 panel floor 0 4 2 5 4 4
 ; la llegada: se levanta en el borde del estante
 end left 0 4 0 0 5 4
-receiver 0 5 3
-inventory sphere 1 pyramid 1
+receiver 0 5 0
+inventory sphere 1 pyramid 2 cube 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
-;! place sphere 3 0 1
-;! place pyramid 3 4 3 up
+;! place sphere 2 0 1
+;! place pyramid 2 4 2 up
+;! place pyramid 0 5 2 right

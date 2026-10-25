@@ -3,7 +3,7 @@
 // representa el espacio 3D, y lo que viaja por ese espacio viaja por el plano.
 //
 // UserParams[0] = (-, grosor de la linea de casilla en px (0 = el de siempre),
-//                  1 = solo lineas, -) -- PuzzleDirector
+//                  1 = solo lineas / 2 portal / 3 capa de luz, -) -- PuzzleDirector
 // UserParams[1].rgb = tinte de la cuadricula (blanco = el de EL TRAZO); .w = origen de las casillas
 // UserParams[2] = (progreso de la luz en metros, segundos desde resuelto o -1,
 //                  tramos (0..2), 1 si la luz llego)  -- SurfaceLight
@@ -198,6 +198,16 @@ float4 PSMain(PSInput input) : SV_TARGET {
 
     float boost = SolvedBoost(UserParams[2].y);
     float3 light = (max(beam, kBeamHot * saturate(mark)) + glow + kBeamHalo * markHalo) * boost;
+
+    // CAPA DE LUZ (UserParams[0].z = 3, SurfaceBeam.strmat, ADITIVA): un hijo
+    // del plano con la misma malla que trae los tramos 3 en adelante
+    // (SurfaceLight). Solo la luz: la cuadricula y la marca ya las dibujo el
+    // plano debajo, y sumarlas otra vez las doblaria. Lo que no es luz se
+    // descarta para no pagar la mezcla en todo el plano.
+    if (UserParams[0].z > 2.5f) {
+        clip(max(core, halo * 1.5f) - 0.02f);
+        return float4((beam + glow) * boost, 1.0f);
+    }
 
     // Modo "solo lineas" (los planos del juego): se descarta lo que no es
     // cuadricula, luz ni marca, y queda todo flotando en el vacio. Los dos

@@ -1,29 +1,52 @@
-; NIVEL 20 - DE FRENTE AL FONDO (24/10/2026, hecho a mano)
+; NIVEL 20 - DE FRENTE AL FONDO (24/10/2026, hecho a mano; rehecho por la
+; dificultad el mismo dia: de 4 piezas a 10).
 ;
 ; Un acordeon: planos plegados en zigzag que llevan la luz del frente al fondo,
-; subiendo y bajando solos. Falta el primer pliegue (la pared cuelga sin tocar
-; el piso) y al final, en la fila de la luz, espera un agujero negro. Una ESFERA
-; tira la luz de costado a una TORSION que la sube a la pared por otra fila; el
-; acordeon la lleva por esa fila, lejos del agujero; en la llegada una CURVA la
-; corre de costado y una ESFERA la deja en el receptor.
+; subiendo y bajando. Falta el primer pliegue (la pared cuelga sin tocar el
+; piso) y en la fila de la fuente tiene un agujero negro: una ESFERA tira la luz
+; de costado a una TORSION que la sube a la pared por otra fila. Por encima cae
+; en un estante, y el segundo pliegue tambien falta: una RAMPA la levanta a otra
+; pared colgada, y por encima, a un estante alto.
+;
+; Ahi la pared que baja tiene un agujero en la fila de la luz: hay que correrla
+; de fila, y eso sobre un piso se hace con dos pares ESFERA + CUBO (la esfera la
+; tira al cubo de al lado, el cubo la deja del otro lado yendo hacia el: un par
+; la manda de costado, el otro la vuelve hacia el fondo). Abajo, el ultimo piso
+; termina en una pared con otro agujero en la fila: la CURVA la sube doblando, a
+; lo largo de la pared, hasta la llegada, y en la llegada un ultimo par esfera +
+; cubo la sube al receptor.
 title FRONT TO BACK
 hint THE ACCORDION FOLDS BY ITSELF. WHAT IS LEFT IS CHOOSING THE ROW
 rules 3
-size 5 6 11
-start floor 1 0 0 3 0 2
+size 6 9 16
+start floor 1 0 0 4 0 2
 source 2 0 0 back
-panel back 1 1 2 3 2 2
-panel floor 1 3 3 3 3 5
-panel front 1 0 6 3 2 6
-panel floor 0 0 6 4 0 10
-fixed blackhole 2 0 8
-end back 0 0 10 4 4 10
-receiver 2 4 10
-inventory sphere 2 twist 1 bend 1 cube 1
+panel back 1 1 2 4 2 2
+fixed blackhole 2 1 2 front
+fixed blackhole 3 1 2 front
+fixed blackhole 4 1 2 front
+panel floor 1 3 3 4 3 5
+panel back 1 4 5 4 5 5
+panel floor 1 6 6 4 6 8
+panel front 1 3 9 4 5 9
+fixed blackhole 1 5 9 back
+fixed blackhole 2 5 9 back
+fixed blackhole 3 5 9 back
+panel floor 1 3 9 4 3 12
+panel back 0 3 12 4 5 12
+fixed blackhole 4 4 12 front
+end left 0 3 9 0 5 12
+receiver 0 5 10
+inventory sphere 4 cube 3 twist 1 ramp 1 bend 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
-;! minimal
 ;! place sphere 2 0 2
 ;! place twist 1 2 2 down front
-;! place bend 1 4 10 back left
-;! place sphere 2 4 10
+;! place ramp 1 3 4 back up
+;! place sphere 1 6 7
+;! place cube 2 6 7 z
+;! place sphere 4 6 7
+;! place cube 4 6 8 x
+;! place bend 4 3 12 back up
+;! place sphere 0 3 10
+;! place cube 0 4 10 z

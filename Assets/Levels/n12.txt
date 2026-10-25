@@ -1,23 +1,30 @@
-; NIVEL 12 - EL POZO: el gusano (24/10/2026, hecho a mano)
+; NIVEL 12 - EL POZO: el gusano (24/10/2026, hecho a mano; con la dificultad,
+; el mismo dia, de 2 piezas a 4: presenta el gusano, asi que casi igual).
 ;
-; Los planos de portal (cian) tambien flotan. La luz trepa por uno vertical que
-; se levanta al final de la franja, y arriba se pierde. Lejos y alto flota otro,
-; horizontal, que lleva a la llegada. Un pozo en el primero hace caer la luz por
-; la garganta y la saca por el otro pozo, sobre el otro plano, "hacia el mismo
-; lado". El receptor esta en la fila del fondo: el pozo de salida va donde la
-; luz tiene que salir.
+; Los planos de portal (cian) tambien flotan. Al costado de la franja se
+; levanta uno vertical, y lejos y alto flota otro, horizontal, que lleva a la
+; llegada. Un pozo en el primero hace caer la luz por la garganta y la saca por
+; el otro pozo, sobre el otro plano, "hacia el mismo lado".
+;
+; Lo que se agrego: la luz nace yendo A LO LARGO de la franja, no hacia el
+; portal (una piramide la dobla hacia el), y la llegada se levanta en el borde
+; del fondo del plano de salida, no en el que la luz encuentra derecho (otra
+; piramide, alla arriba). El pozo de salida elige en que fila sale la luz, y la
+; segunda piramide tiene que estar en esa fila.
 title THE PIT
 hint WHAT FALLS INTO ONE PIT COMES OUT OF THE OTHER, IN ANOTHER DIMENSION
 rules 3
 size 8 6 4
 start floor 0 0 0 2 0 3
-source 0 0 1 right
+source 0 0 3 front
 portal right 2 0 0 2 3 3
 portal floor 5 4 0 7 4 3
-end right 7 4 0 7 5 3
-receiver 7 5 3
-inventory wormhole 1 sphere 1
+end back 4 4 3 7 5 3
+receiver 6 5 3
+inventory wormhole 1 pyramid 2 sphere 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
-;! place wormhole 2 0 1 5 4 3
+;! place pyramid 0 0 1 up
+;! place wormhole 2 2 1 5 4 1
+;! place pyramid 6 4 1 up

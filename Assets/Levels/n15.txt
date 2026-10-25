@@ -1,21 +1,36 @@
-; NIVEL 15 - EL ECLIPSE: la esfera de 5 (24/10/2026, hecho a mano)
+; NIVEL 15 - EL ECLIPSE: la esfera de 5 (24/10/2026, hecho a mano; rehecho por
+; la dificultad el mismo dia: de 1 pieza a 5).
 ;
-; Un plano bajo y, cuatro casillas mas arriba, uno grande que flota mirando
-; hacia abajo. Nada chico llega de uno al otro: la esfera de 1 toca a una
-; casilla. La esfera de 5 se apoya en el de abajo y toca el de arriba con su
-; polo: la luz da media vuelta por ella, pasa al plano de arriba (cabeza abajo,
-; volviendo hacia atras) y en su borde baja por la llegada.
+; La esfera de 5 se apoya en un plano y toca con su polo otro que flota cuatro
+; casillas mas arriba, mirando hacia abajo: la luz da media vuelta por ella y
+; pasa al de arriba, cabeza abajo y volviendo hacia atras. Nada chico llega de
+; uno al otro.
+;
+; Pero ahora hay que llegar a su apoyo. La luz nace en un piso bajo, a lo largo
+; (una piramide de punta la dobla), y el plano donde va la esfera grande es un
+; estante del otro lado de una pared: la esfera de 3 tira la luz de costado a la
+; pared, que la sube y por encima la deja en el estante. Despues del techo,
+; girar dos veces (las dos piramides que quedan, cada una en su postura) para
+; bajar por la llegada hasta el receptor, que esta en su rincon de abajo.
 title THE ECLIPSE
 hint THE BIGGER THE SPHERE, THE FARTHER IT REACHES
 rules 3
-size 9 7 7
-start floor 0 0 2 5 0 4
-source 0 0 3 right
-panel ceiling 0 4 1 7 4 5
-end left 0 1 1 0 4 5
-receiver 0 1 3
-inventory sphere5 1 sphere 1 pyramid 1
+size 9 10 12
+start floor 0 0 0 6 0 5
+source 0 0 0 back
+panel back 2 0 5 4 3 5
+panel floor 0 4 6 8 4 10
+panel ceiling 0 8 2 8 8 10
+end right 8 5 0 8 8 5
+receiver 8 5 0
+fixed blackhole 5 0 2 up
+fixed blackhole 5 0 4 up
+inventory sphere3 1 sphere5 1 pyramid 3 cube 1 sphere 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
-;! place sphere5 3 2 3
+;! place pyramid 0 0 4 down
+;! place sphere3 3 1 4
+;! place sphere5 3 6 8
+;! place pyramid 3 8 5 up
+;! place pyramid 8 5 5 left

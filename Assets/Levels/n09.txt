@@ -1,21 +1,32 @@
-; NIVEL 09 - LA CINTA: la torsion (24/10/2026, hecho a mano)
+; NIVEL 09 - LA CINTA: la torsion (24/10/2026, hecho a mano; rehecho por la
+; dificultad el mismo dia: de 1 pieza a 4).
 ;
-; Una franja baja y, a su costado, una cerca vertical que flota y sigue mas
-; alla de donde la franja se acaba. La esfera tambien le pasa la luz a la cerca,
-; pero DOBLANDOLA: la luz sube por la cerca y se pierde arriba. La torsion se la
-; pasa sin doblarla: la luz sigue hacia adelante, ahora por la cerca, hasta el
-; plano de llegada. Lo que se aprende es la diferencia entre las dos.
+; Una franja baja y, a su costado, una cerca vertical que flota. La esfera
+; tambien le pasa la luz a la cerca, pero DOBLANDOLA. La torsion se la pasa sin
+; doblarla: la luz sigue hacia adelante, ahora por la cerca. Lo que se aprende
+; es la diferencia entre las dos.
+;
+; Pero la cerca no lleva a ningun lado: se acaba. Por encima de ella se pliega
+; un estante (del otro lado, como en EL PLIEGUE), y la luz tiene que subir la
+; cerca (una piramide apoyada en ella), correr el estante hasta su borde (otra
+; piramide, ahora de punta) y subir un escalon (la cuna) al estante alto, donde
+; se levanta la llegada. Cuatro planos, cuatro piezas, una por plano.
 title THE RIBBON
 hint THE SPHERE TURNS LIGHT. THE TWIST MOVES IT TO ANOTHER PLANE AND LETS IT GO ON
 rules 3
-size 9 5 4
-start floor 0 0 0 4 0 1
+size 10 6 6
+start floor 0 0 0 3 0 1
 source 0 0 1 right
-panel back 4 0 1 8 2 1
-end right 8 0 0 8 4 3
-receiver 8 0 0
-inventory twist 1 sphere 1
+panel back 4 0 1 7 2 1
+panel floor 4 3 2 7 3 4
+panel floor 8 4 2 9 4 4
+end right 9 4 2 9 5 4
+receiver 9 5 3
+inventory twist 1 pyramid 2 prism 1 sphere 1 cube 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
 ;! place twist 2 0 1 right up
+;! place pyramid 5 0 1 front
+;! place pyramid 5 3 3 down
+;! place prism 7 3 3 right down

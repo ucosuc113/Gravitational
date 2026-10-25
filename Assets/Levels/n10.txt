@@ -1,21 +1,39 @@
-; NIVEL 10 - A LA IZQUIERDA: la curva (24/10/2026, hecho a mano)
+; NIVEL 10 - A LA IZQUIERDA: la curva (24/10/2026, hecho a mano; rehecho por la
+; dificultad el mismo dia: de 1 pieza a 5).
 ;
-; La franja choca con una pared que flota, ancha. Sin piezas la luz sube por
-; ella (la arista concava) y se pierde arriba. La curva tambien la sube a la
-; pared, pero DOBLANDO a la izquierda: la luz corre a lo largo de la pared, a ras
-; del piso, hasta el plano de llegada que se levanta en su borde del fondo, y
-; dobla otra vez en la esquina.
+; La franja choca con una pared que flota. Sin piezas la luz sube por ella (la
+; arista concava) y se pierde arriba. La curva tambien la sube a la pared, pero
+; DOBLANDO a la izquierda: la luz corre a ras del piso hasta la esquina, donde
+; otra pared en L la dobla otra vez, ahora a lo largo.
+;
+; Despues, una escalera de dos paredes: la piramide de PUNTA contra la pared
+; hace lo que la curva al reves (la luz que corre a lo largo de la pared sube
+; derecho), por encima la pared se pliega en un estante, y en el estante la
+; segunda curva y la segunda piramide repiten el par. Arriba, la torsion pasa
+; la luz del ultimo estante a una cerca sin doblarla, y la cerca termina en la
+; llegada. Dos curvas: la que sube doblando, y la piramide que dobla subiendo.
 title TO THE LEFT
 hint A WALL ALONE LIFTS LIGHT STRAIGHT UP. THE CURVE LIFTS IT WHILE TURNING
 rules 3
-size 6 5 6
+size 6 9 13
 start floor 0 0 0 3 0 1
 source 0 0 0 right
 panel right 3 0 0 3 2 5
-end back 0 0 5 3 3 5
-receiver 0 0 5
-inventory bend 1 sphere 1
+panel back 0 0 5 3 2 5
+panel floor 0 3 6 3 3 8
+panel back 0 3 8 3 5 8
+panel floor 0 6 9 3 6 10
+panel left 0 6 9 0 8 12
+end back 0 6 12 3 8 12
+receiver 3 6 12
+fixed blackhole 0 3 6 up
+fixed blackhole 1 6 9 up
+inventory bend 2 pyramid 2 twist 1 sphere 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
 ;! place bend 3 0 0 right up
+;! place pyramid 2 0 5 back
+;! place bend 2 3 8 back up
+;! place pyramid 0 3 8 back
+;! place twist 0 6 9 back up

@@ -1,29 +1,49 @@
-; NIVEL 23 - SINGULARIDAD (24/10/2026, hecho a mano)
+; NIVEL 23 - SINGULARIDAD (24/10/2026, hecho a mano; rehecho por la dificultad
+; el mismo dia: de 5 piezas a 16). El final: todo, una vez.
 ;
-; El final: seis planos en cinco orientaciones. Una RAMPA sube la luz a una
-; pared suspendida, que la pliega a un estante alto; en el estante un agujero
-; negro obliga a girar con una PIRAMIDE; al fondo se levanta un portal y el
-; GUSANO la lleva a una isla baja y lejana; la llegada flota muy arriba, cabeza
-; abajo, y solo una ESFERA DE 5 la alcanza: la luz la recorre de vuelta hasta
-; el receptor.
+; LO QUE VUELVE: la luz nace mirando para el otro lado y un agujero blanco la
+; devuelve; una cuna hace que la vuelta sea otro camino y la sube a un estante
+; sobre la fuente, y un cubo la sube al siguiente. Ahi una piramide de punta la
+; manda al fondo y otra cuna la sube a un estante de portal: EL POZO, el primer
+; gusano, la tira a una isla alta. En la isla, una piramide de punta la endereza
+; y un par ESFERA + CUBO la vuelve hacia el fondo; una cuna la sube a otro
+; estante, otra piramide de punta, otra cuna, y el segundo gusano la tira a la
+; ultima isla, la mas alta. Ahi una piramide la manda a la llegada, y en la
+; llegada una ultima piramide, de punta contra ella, la corre hasta el receptor.
+;
+; Cinco tipos de pieza (la barra no tiene lugar para mas): la esfera de 5 del
+; plan quedo afuera a cambio del agujero blanco y los dos gusanos.
 title SINGULARITY
 hint EVERYTHING YOU LEARNED, ONCE
 rules 3
-size 12 9 6
-start floor 0 0 0 3 0 2
-source 0 0 1 right
-panel right 3 1 0 3 4 2
-panel floor 4 5 0 7 5 4
-fixed blackhole 6 5 1
-portal back 4 5 4 7 8 4
-portal floor 8 0 0 11 0 5
-end ceiling 7 4 0 11 4 5
-receiver 9 4 0
-inventory ramp 1 pyramid 2 wormhole 1 sphere5 1 sphere 1
+size 16 12 16
+start floor 3 0 1 4 0 1
+source 3 0 1 right
+panel floor 5 0 1 9 0 1
+fixed whitehole 9 0 1
+panel floor 2 1 1 4 1 1
+panel floor 0 2 1 1 2 4
+portal floor 0 3 5 2 3 6
+portal floor 6 5 6 10 5 10
+panel floor 8 6 11 11 6 13
+portal floor 12 7 11 13 7 13
+portal floor 11 9 2 14 9 5
+end back 11 9 5 14 11 5
+receiver 14 10 5
+inventory prism 4 pyramid 5 cube 2 sphere 2 wormhole 2
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
-;! minimal
-;! place ramp 2 0 1 right up
-;! place pyramid 5 5 1 up
-;! place wormhole 5 6 4 9 0 0
-;! place sphere5 9 2 3
+;! place prism 5 0 1 down left
+;! place cube 2 1 1 z
+;! place pyramid 0 2 1 down
+;! place prism 0 2 4 back down
+;! place wormhole 0 3 6 7 5 6
+;! place pyramid 7 5 7 down
+;! place sphere 9 5 7
+;! place cube 9 5 8 x
+;! place prism 9 5 10 back down
+;! place pyramid 9 6 12 down
+;! place prism 11 6 12 right down
+;! place wormhole 12 7 12 11 9 3
+;! place pyramid 12 9 3 up
+;! place pyramid 12 10 5 back

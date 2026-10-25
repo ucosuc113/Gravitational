@@ -62,6 +62,27 @@ public:
             const bool seen = kit::WorldToScreen(vp, world.x, world.y, world.z, sx, sy) && PickAt(s.board, *cam, container, {p0, p1}, sx, sy, w, h, pick);
             Expect(seen && pick.figure < 0 && pick.cell == m_target && pick.normal == -s.board.planes[0].normal,
                    L"clic sobre el plano de salida: cae en la celda de al lado de la fuente", seen ? Cell(pick.cell) : L"nada bajo el pixel");
+            // 1b. El BORDE: cerca de la esquina de afuera de las celdas extremas
+            // del plano. El raycast del motor descartaba la mitad de afuera de
+            // todo Plane (su caja era de 1x1 y el Plane es de 2x2), y el
+            // fantasma desaparecia al pasar el centro de esas celdas. La prueba
+            // de arriba apunta al CENTRO de una celda, asi que no lo veia.
+            const Face& f0 = s.board.planes[0];
+            for (int corner = 0; corner < 2; ++corner) {
+                const Int3 edge = corner == 0 ? f0.lo : f0.hi;
+                const float out = corner == 0 ? -0.4f : 0.4f;
+                Vec3f q = PlanePoint(s.board, 0, edge);
+                if (f0.normal.x == 0) q.x += out;
+                if (f0.normal.y == 0) q.y += out;
+                if (f0.normal.z == 0) q.z += out;
+                float ex = 0, ey = 0;
+                Pick edgePick;
+                const bool edgeSeen = kit::WorldToScreen(vp, q.x, q.y, q.z, ex, ey) && PickAt(s.board, *cam, container, {p0, p1}, ex, ey, w, h, edgePick);
+                // Una pieza ya puesta en esa celda se lleva el clic, y esta bien.
+                Expect(edgeSeen && (edgePick.figure >= 0 || edgePick.cell == edge),
+                       corner == 0 ? L"clic en el borde de afuera de la primera celda del plano" : L"clic en el borde de afuera de la ultima celda del plano",
+                       edgeSeen ? Cell(edgePick.cell) : L"nada bajo el pixel");
+            }
             // 2. Poner una esfera ahi, como el clic.
             const std::vector<Figure> stances = s.board.PlacementsFor(Shape::Sphere, m_target, -s.board.planes[0].normal);
             ++s.board.inventory[static_cast<int>(Shape::Sphere)];

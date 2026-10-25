@@ -1,24 +1,54 @@
-; NIVEL 19 - EL PUENTE (24/10/2026, hecho a mano)
+; NIVEL 19 - EL PUENTE (24/10/2026, hecho a mano; rehecho por la dificultad el
+; mismo dia: de 3 piezas a 10, y ahora son DOS puentes).
 ;
-; La llegada esta del lado contrario al que mira la luz. Muy arriba cuelga un
-; puente cabeza abajo que cruza todo el vacio de vuelta: para ir hacia adelante,
-; hacia atras. En su centro cuelga un agujero negro. La ESFERA DE 3 tira la luz
-; de costado a una esfera chica, esta la sube a un CUBO colgado del puente, y la
-; franja del cubo la manda por el borde del puente, lejos del horizonte.
+; La llegada esta del lado contrario al que mira la luz. Arriba cuelga un puente
+; cabeza abajo que cruza el vacio de vuelta: para ir hacia adelante, hacia
+; atras. La ESFERA DE 3 tira la luz de costado a una esfera chica, esta la sube
+; a un CUBO colgado del puente, y la franja del cubo la manda por el borde del
+; puente, lejos del agujero negro de su centro.
+;
+; Al final del puente la luz no se pierde: una pared corta en su borde la lleva
+; por encima, y el puente es tambien un piso (la luz vuelve a ir hacia adelante).
+; Ahi el par se repite al reves - una esfera la tira de costado a un cubo
+; apoyado, que la pasa a la fila de al lado - y una piramide de punta la manda
+; a la segunda ESFERA DE 3, que la sube al segundo puente, otra vez hacia atras.
+; En ese puente hay otro agujero en la fila: dos piramides colgadas lo rodean.
+; La llegada cuelga de su borde, en las dos filas del fondo, y el receptor esta
+; en la de al lado: la ultima piramide, de punta contra ella.
 title THE BRIDGE
 hint TO GO FORWARD, SOMETIMES YOU HAVE TO GO BACK
 rules 3
-size 10 6 5
-start floor 6 0 1 8 0 3
-source 6 0 2 right
-panel ceiling 0 2 0 8 2 4
-fixed blackhole 4 2 2 down
-end left 0 0 0 0 2 4
-receiver 0 0 0
-inventory sphere3 1 pyramid 2 sphere 1 cube 1 torus 1
+size 12 8 7
+start floor 8 0 1 10 0 3
+source 8 0 2 right
+panel ceiling 1 2 0 10 2 5
+fixed blackhole 5 2 2 down
+; La fila 4 del primer puente (la otra salida del cubo colgado) cae aca.
+fixed blackhole 9 2 4 down
+panel right 0 2 0 0 3 5
+panel floor 1 4 0 7 4 5
+; Al pie de la llegada, en el piso de en medio: sin estos, una esfera de 3 ahi
+; mismo sube la luz al segundo puente justo en su esquina con la llegada.
+fixed blackhole 1 4 3
+fixed blackhole 1 4 4
+fixed blackhole 1 4 5
+; El piso de arriba del primer puente y el segundo puente no llegan hasta
+; encima de la fuente: si llegaran, una torre de esferas subiria derecho a ellos
+; desde la franja de salida.
+panel ceiling 1 6 0 7 6 5
+fixed blackhole 3 6 3 up
+end left 1 5 4 1 6 5
+receiver 1 5 4
+inventory sphere3 2 sphere 2 cube 2 pyramid 4 torus 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
-;! minimal
-;! place sphere3 8 1 2
-;! place sphere 8 1 0
-;! place cube 8 2 0 -z
+;! place sphere3 10 1 2
+;! place sphere 10 1 0
+;! place cube 10 2 0 -z
+;! place sphere 3 4 0
+;! place cube 3 4 1 x
+;! place pyramid 3 4 3 down
+;! place sphere3 7 5 3
+;! place pyramid 5 6 3 down
+;! place pyramid 5 6 5 up
+;! place pyramid 1 5 5 left

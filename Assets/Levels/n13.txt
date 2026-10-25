@@ -1,25 +1,38 @@
-; NIVEL 13 - HORIZONTE: los agujeros negros (24/10/2026, hecho a mano)
+; NIVEL 13 - HORIZONTE: los agujeros negros (24/10/2026, hecho a mano; rehecho
+; por la dificultad el mismo dia: de 2 piezas a 5).
 ;
-; Al final del piso se levanta una pared alta que flota, y en su cara, a media
-; altura, una fila de agujeros negros. La luz sube sola por la pared y cae en el
-; horizonte. Hay que esquivarlos SOBRE la pared: dos piramides apoyadas en ella
-; la corren de costado, mas alla de la fila, y la vuelven a subir. Arriba la
-; pared se pliega en la llegada.
+; Al final del piso se levanta una pared alta que flota, y en su cara, DOS filas
+; de agujeros negros desfasadas: la de abajo deja libre el lado del fondo, la de
+; arriba el del frente. La luz sube sola por la pared y cae en el horizonte. Hay
+; que esquivarlos SOBRE la pared, en zigzag: una piramide apoyada de BASE corre
+; la luz de costado y una de PUNTA la vuelve a subir; entre las dos filas, al
+; reves (la de punta la corre, la de base la sube). Cuatro piramides, las dos
+; posturas dos veces, y cada una tiene que ir en su lado. Arriba la pared se
+; pliega en la llegada. Y la luz nace yendo a lo largo del piso, no hacia la
+; pared: la quinta piramide la dobla hacia ella.
 title HORIZON
 hint WHAT TOUCHES A BLACK HOLE NEVER RETURNS. GO AROUND IT
 rules 3
-size 6 7 5
-start floor 0 0 1 3 0 3
-source 0 0 2 right
-panel right 3 0 0 3 5 4
-fixed blackhole 3 3 2 left
-fixed blackhole 3 3 1 left
-fixed blackhole 3 3 3 left
-end floor 4 6 0 5 6 4
-receiver 5 6 4
-inventory pyramid 2 sphere 1 cube 1
+size 7 8 6
+start floor 0 0 0 3 0 4
+source 0 0 4 front
+panel right 3 0 0 3 6 5
+end floor 4 7 0 6 7 5
+receiver 6 7 1
+fixed blackhole 3 2 0 left
+fixed blackhole 3 2 1 left
+fixed blackhole 3 2 2 left
+fixed blackhole 3 2 3 left
+fixed blackhole 3 4 2 left
+fixed blackhole 3 4 3 left
+fixed blackhole 3 4 4 left
+fixed blackhole 3 4 5 left
+inventory pyramid 5 sphere 1 torus 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
+;! place pyramid 0 0 2 up
 ;! place pyramid 3 0 2 left
 ;! place pyramid 3 0 4 right
+;! place pyramid 3 3 4 right
+;! place pyramid 3 3 1 left

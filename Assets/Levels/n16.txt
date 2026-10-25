@@ -1,24 +1,38 @@
-; NIVEL 16 - TRES ALTURAS (24/10/2026, hecho a mano)
+; NIVEL 16 - CUATRO ALTURAS (antes TRES ALTURAS; 24/10/2026, hecho a mano; rehecho por la dificultad
+; el mismo dia: de 3 piezas a 7, y ahora son CUATRO alturas).
 ;
-; Tres planos horizontales a tres alturas, cada uno corrido hacia otro lado. La
-; luz sube del primero al segundo por una RAMPA (a una pared suspendida, y por
-; encima), en el segundo una PIRAMIDE la dobla hacia el fondo, y una CUNA la sube
-; al tercero, desde donde trepa por la llegada. Una pieza distinta por altura.
-title THREE HEIGHTS
+; Cuatro planos horizontales a cuatro alturas, cada uno corrido hacia otro lado:
+; una escalera que gira. La luz sube del piso al primer estante por una RAMPA (a
+; una pared suspendida, y por encima). En cada estante hay que GIRAR antes de
+; subir al siguiente - una piramide - y subir con una CUNA que mire hacia donde
+; va la luz ahora. En el ultimo, la llegada se levanta al costado de la luz, no
+; enfrente: una ESFERA en la ultima casilla le pasa la luz de costado.
+title FOUR HEIGHTS
 hint EACH HEIGHT IS REACHED A DIFFERENT WAY
 rules 3
-size 8 7 8
+size 9 9 9
 start floor 0 0 0 3 0 2
 source 0 0 1 right
 panel right 3 1 0 3 2 3
-panel floor 4 3 0 6 3 3
-panel floor 4 4 4 6 4 7
-end back 3 4 7 7 6 7
-receiver 5 6 7
-inventory ramp 1 pyramid 1 prism 1 sphere 1
+panel floor 4 3 0 7 3 3
+panel floor 1 4 4 7 4 7
+panel floor 0 5 3 1 5 7
+end right 1 5 1 1 8 4
+receiver 1 8 3
+; Tres agujeros en el aire, bajo la llegada: la llegada cuelga justo encima de
+; la franja de salida, y sin ellos una torre de seis piezas (piramide, cuna,
+; rampa, dos piramides y la esfera) sube por ese vacio sin pasar por ningun
+; estante.
+fixed blackhole 1 4 1
+fixed blackhole 1 4 2
+fixed blackhole 1 4 3
+inventory ramp 1 pyramid 4 prism 2 sphere 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
-;! minimal
 ;! place ramp 2 0 1 right up
 ;! place pyramid 5 3 1 up
 ;! place prism 5 3 3 down back
+;! place pyramid 5 4 5 up
+;! place prism 2 4 5 down left
+;! place pyramid 1 5 5 up
+;! place sphere 1 5 3

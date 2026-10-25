@@ -1,29 +1,45 @@
-; NIVEL 22 - GRAVEDAD (24/10/2026, hecho a mano)
+; NIVEL 22 - GRAVEDAD (24/10/2026, hecho a mano; rehecho por la dificultad el
+; mismo dia: de 4 piezas a 15, y ahora son TRES islas y dos saltos).
 ;
-; Dos islas lejanas, cada una con un plano de portal (cian). En la primera el
-; portal flota de costado, paralelo a la luz: una PIRAMIDE la lleva hasta el. En
-; la segunda, alta, una cerca de agujeros negros guarda la llegada: el pozo de
-; salida del GUSANO tiene que ir detras de la cerca, y en la llegada otra
-; PIRAMIDE corre la luz hasta la columna del receptor.
+; Tres islas que no se tocan, cada una mas alta que la anterior, y en cada una
+; un estante de portal (cian). En la primera, la luz nace a lo largo de la
+; franja: una piramide la dobla y una cuna la sube al estante de portal, donde
+; el primer GUSANO la tira a la segunda isla. Alli sale yendo hacia el fondo:
+; una piramide de punta la endereza hacia el borde, otra cuna la sube a un
+; estante, y en el un par ESFERA + CUBO la vuelve hacia el fondo, a la franja de
+; portal del segundo gusano. En la tercera isla, otra vez: piramide, cuna al
+; estante alto, el par esfera + cubo hacia la llegada, y en la llegada una
+; piramide corre la luz hasta el receptor.
+;
+; El gusano elige DONDE sale la luz: cada pozo de salida decide la fila en la
+; que hay que doblar despues.
 title GRAVITY
 hint THE WORMHOLE CHOOSES WHERE TO COME OUT. THE HOLES, WHERE NOT
 rules 3
-size 10 8 5
-start floor 0 0 0 2 0 3
+size 16 11 8
+start floor 0 0 0 3 0 2
 source 0 0 1 right
-portal back 0 0 3 2 3 3
-portal floor 5 5 0 8 5 4
-panel floor 9 5 0 9 5 4
-fixed blackhole 5 5 3
-fixed blackhole 6 5 3
-fixed blackhole 7 5 3
-fixed blackhole 8 5 3
-end back 5 5 4 9 7 4
-receiver 9 7 4
-inventory pyramid 2 wormhole 1 sphere 1 cube 1
+portal floor 0 1 3 3 1 4
+portal floor 6 4 0 10 4 5
+panel floor 11 5 0 13 5 3
+portal floor 11 5 4 13 5 5
+portal floor 9 7 1 13 7 4
+panel floor 14 8 1 15 8 5
+end back 13 8 5 15 10 5
+receiver 13 9 5
+inventory pyramid 4 wormhole 2 prism 3 sphere 3 cube 2
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
-;! minimal
-;! place pyramid 1 0 1 up
-;! place wormhole 1 0 3 5 5 4
-;! place pyramid 5 7 4 back
+;! place pyramid 2 0 1 up
+;! place prism 2 0 2 back down
+;! place wormhole 2 1 4 7 4 0
+;! place pyramid 7 4 1 down
+;! place prism 10 4 1 right down
+;! place sphere 12 5 1
+;! place cube 12 5 2 x
+;! place wormhole 12 5 4 10 7 2
+;! place pyramid 10 7 3 down
+;! place prism 13 7 3 right down
+;! place sphere 15 8 3
+;! place cube 15 8 4 x
+;! place pyramid 15 9 5 front

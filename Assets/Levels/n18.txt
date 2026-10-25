@@ -1,26 +1,45 @@
-; NIVEL 18 - LA TORRE (24/10/2026, hecho a mano)
+; NIVEL 18 - LA TORRE (24/10/2026, hecho a mano; rehecho por la dificultad el
+; mismo dia: de 3 piezas a 9, y dos pisos mas de torre).
 ;
 ; Planos apilados alrededor de una columna vacia, cada uno mirando hacia otro
-; lado: la luz sube sola el primer tramo y se queda en un estante. Una ESFERA la
+; lado. La luz sube sola el primer tramo y se queda en un estante. Una ESFERA la
 ; pasa a la pared de atras; sobre esa pared vertical, un TOROIDE se la pasa a un
-; CUBO, y la franja del cubo la dobla arriba hacia la llegada. Una cadena de
-; piezas sobre un plano parado.
+; CUBO, y la franja del cubo la deja en el estante de arriba, que tapa la pared
+; (sin la cadena, la luz que sube sola se queda debajo de el).
+;
+; En ese estante la luz va hacia la columna: dos piramides de punta la llevan
+; al borde del fondo, a lo largo de la segunda pared, y ahi la cadena se repite
+; GIRADA - la esfera, el toroide y el cubo con la franja al reves, que la manda
+; para el otro lado - hasta el estante mas alto. La llegada se levanta en su
+; borde, y el receptor esta en su rincon: una piramide mas.
 title THE TOWER
 hint PIECES CAN ALSO PASS THE LIGHT TO EACH OTHER
 rules 3
-size 7 10 7
+size 8 13 9
 start floor 0 0 2 2 0 4
 source 0 0 3 right
 panel right 2 0 2 2 3 4
 panel floor 3 4 1 5 4 3
 panel back 3 4 3 5 7 3
-panel floor 1 8 3 5 8 6
-end left 1 8 3 1 9 6
-receiver 1 9 3
-inventory pyramid 2 sphere 1 cube 1 prism 1 torus 1
+panel floor 1 8 3 6 8 6
+; Lo que sube derecho por la primera pared pasa por encima y cae en esta fila:
+; al estante solo se llega por la cadena (el cubo deja la luz del otro lado).
+fixed blackhole 3 8 4
+fixed blackhole 4 8 4
+fixed blackhole 5 8 4
+panel back 1 8 6 6 10 6
+panel floor 0 11 6 7 11 8
+end right 7 11 6 7 12 8
+receiver 7 12 8
+inventory pyramid 3 sphere 2 cube 2 torus 2 prism 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
-;! minimal
 ;! place sphere 3 4 3
 ;! place torus 3 6 3 x
 ;! place cube 3 7 3 z
+;! place pyramid 1 8 3 down
+;! place pyramid 1 8 6 down
+;! place sphere 4 8 6
+;! place torus 4 9 6 x
+;! place cube 4 10 6 -z
+;! place pyramid 7 12 6 left

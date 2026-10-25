@@ -1,23 +1,33 @@
-; NIVEL 11 - EL ANILLO: el toroide (24/10/2026, hecho a mano)
+; NIVEL 11 - EL ANILLO: el toroide (24/10/2026, hecho a mano; rehecho por la
+; dificultad el mismo dia: de 1 pieza a 5).
 ;
-; Dos planos flotan uno sobre otro, a una casilla, el de arriba mirando hacia
-; abajo; a un costado, una pared baja. La luz corre entre los dos. La esfera
-; manda la luz a lo primero que toque, y sus costados van antes que arriba: la
-; tira a la pared y se pierde. El toroide de costado no tiene costados: solo su
-; anillo. La pasa al plano de arriba, que la devuelve hacia atras, mas alla de
-; donde nacio, hasta la llegada.
+; Dos SANDWICHES de planos, uno abajo y otro arriba, separados por una pared que
+; flota detras del de abajo. La luz corre entre el piso y el techo del primero.
+; El toroide de costado no tiene costados: solo su anillo, que toca arriba,
+; abajo, adelante y atras. Le pasa la luz a lo que tenga ADELANTE antes que al
+; techo, y ahi hay que decidir que poner: un cubo con la franja bien girada la
+; manda a la pared, y una piramide apoyada en la pared la sube. Por encima, la
+; pared se pliega en el sandwich de arriba, y ahi el par se repite al reves: la
+; esfera tira la luz de costado, a un toroide, y el anillo la sube al techo, que
+; la devuelve hacia atras hasta la llegada.
 title THE RING
 hint THE TORUS ONLY CONDUCTS AROUND ITS RING: IT HAS NO SIDES
 rules 3
-size 7 4 3
-start floor 2 0 1 6 0 1
+size 9 7 5
+start floor 2 0 1 8 0 1
 source 2 0 1 right
-panel ceiling 0 0 1 6 0 1
-panel back 3 0 1 6 1 1
-end left 0 0 0 0 3 2
-receiver 0 0 1
-inventory torus 1 sphere 1
+panel ceiling 0 0 1 8 0 1
+panel back 0 0 1 8 2 1
+panel floor 0 3 2 8 3 3
+panel ceiling 0 3 2 8 3 3
+end left 0 3 2 0 6 4
+receiver 0 3 2
+inventory torus 2 sphere 2 cube 1 pyramid 1
 ;
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! minimal
 ;! place torus 3 0 1 z
+;! place cube 4 0 1 -y
+;! place pyramid 5 0 1 front
+;! place sphere 5 3 2
+;! place torus 4 3 2 z

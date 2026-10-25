@@ -43,9 +43,18 @@ inline constexpr float kPi = 3.14159265f;
 // los 8 float4 del material dan para dos (SurfaceLight.cpp). Un recorrido que
 // le pase mas a una superficie se dibuja cortado - n10 terminaba con el tramo
 // que entra al receptor invisible -, asi que es una invariante firme
-// (TraceInvariants.h) y levellab rechaza las soluciones que la rompen. La
-// Fase 3 de docs/arquitectura-luz.md la saca para los planos.
+// (TraceInvariants.h) y levellab rechaza las soluciones que la rompen.
 inline constexpr int kDrawSlots = 2;
+
+// Los PLANOS tienen ademas kPlaneBeamLayers capas de luz: hijos con la misma
+// malla y un material aditivo que solo dibuja luz (SurfaceBeam.strmat), dos
+// tramos cada una (24/10/2026, la parte de los planos de la Fase 3 de
+// docs/arquitectura-luz.md). Hacia falta: un jugador que esquiva agujeros
+// negros con dos piramides sobre una pared le pasa tres o cuatro tramos, y el
+// trazo se cortaba a mitad de la pared (el bug de HORIZONTE). Las piezas siguen
+// con dos: casi nunca pasan de uno.
+inline constexpr int kPlaneBeamLayers = 3;
+inline constexpr int kPlaneDrawSlots = kDrawSlots * (1 + kPlaneBeamLayers);
 
 // --- De la caja al mundo ---
 //

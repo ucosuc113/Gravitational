@@ -1,19 +1,30 @@
 // EL HUD DE LA PARTIDA: el nivel, el estado de la luz, el inventario, las
 // herramientas y los controles de la luz. Va en el vacio "Puzzle".
 //
-// Era UI de la escena (Canvas, botones) leida por campos del director: una
-// fila de cuatro botones fijos (ESFERA, CUBO, ROTAR, QUITAR) y la seleccion
-// escrita como "> SPHERE <". Con doce piezas y un inventario distinto por
-// nivel, una botonera fija no alcanza: este script la ARMA segun el nivel -
-// una casilla por pieza que el nivel da, con su dibujo, su cantidad y su
-// tecla - y la dibuja con la misma paleta y la misma fuente que el menu
-// (Flow/MenuKit.h), asi el juego y el menu se leen como una sola cosa.
+// La FORMA del HUD es de la escena: el arbol "HUD" de la Jerarquia (UiCanvas
+// de 720, etiquetas, paneles y botones; ver docs/hud-jerarquia.md). Mover un
+// boton, cambiar un color o el tamano de un texto se hace en el Inspector, sin
+// recompilar, y el panel Juego lo muestra tambien fuera de Play. Este script es
+// el PUENTE: escribe los textos, prende y apaga lo que depende del estado, lee
+// los clics de los botones y pinta el boton elegido.
 //
-// Se dibuja con la UI inmediata (UiService::Frame) y no con nodos de la
-// escena: los nodos tendrian que crearse y destruirse con cada nivel, y una
-// casilla es un recuadro, un dibujo de lineas y dos textos - justo lo que la
-// lista inmediata hace en una llamada. Los rectangulos que ocupa se publican
-// en la sesion (hudRects): FigureBuilder no toma como jugada un clic sobre el HUD.
+// Lo unico que sigue dibujado desde aca son las CASILLAS DE PIEZAS: una por
+// pieza que el nivel da, con su dibujo, su cantidad y su tecla, y cambian de
+// numero con cada nivel. Como nodos habria que crearlas y destruirlas al cargar
+// cada nivel; con la UI inmediata son un recuadro, un dibujo de lineas y dos
+// textos. Van en el hueco "HUD/Barra/Casillas", al que este script le pone el
+// ancho segun cuantas haya: asi la barra sigue centrada con 1 o con 5 tipos. La
+// UI inmediata se dibuja ENCIMA de la de la escena, asi que las casillas quedan
+// sobre el velo de la barra.
+//
+// Antes (hasta el 25/10/2026) todo el HUD era UI inmediata, y antes de eso una
+// botonera fija de la escena (ESFERA, CUBO, ROTAR, QUITAR) que con doce piezas
+// no alcanzaba. El reparto de ahora toma lo bueno de cada uno.
+//
+// El fundido de entrada y salida: los componentes no tienen alfa de grupo, asi
+// que al empezar se guarda el color de cada componente del arbol tal como lo
+// dejo el Inspector, y cada frame se escribe ese color por el alfa del HUD (mas
+// lo que cambie el estado: el boton elegido, el color del estado de la luz).
 //
 // Todo tiene tecla, y la tecla esta escrita en el boton:
 //   1..9 las piezas, R rotar, X quitar, Z deshacer, ESPACIO pausa, F paso,
@@ -24,15 +35,22 @@
 #include "../Flow/GameFlow.h"
 #include "../Flow/MenuKit.h"
 
+#include "Engine/Diagnostics/Log.h"
 #include "Engine/Input/InputService.h"
+#include "Engine/Scene/ComponentQuery.h"
+#include "Engine/Scene/SceneQuery.h"
+#include "Engine/Scene/SceneService.h"
 #include "Engine/Scripting/IScript.h"
 #include "Engine/Scripting/ScriptRegistry.h"
+#include "Engine/Text.h"
+#include "Engine/UI/SceneUi.h"
 #include "Engine/UI/UiService.h"
 
 #include <cmath>
 #include <initializer_list>
 #include <cstdio>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 using namespace strace;
@@ -139,6 +157,20 @@ std::string Clock(float seconds) {
     return buf;
 }
 
+UiColor WithAlpha(UiColor c, float a) {
+    c.a *= a;
+    return c;
+}
+
+// Las medidas de la barra, en unidades del canvas (pixeles de 720p). Las de los
+// botones son las de la escena; estas son las que el puente necesita para
+// colocar lo que depende de cuantas casillas hay.
+constexpr float kSlot = 60.0f;   // una casilla de pieza (y la altura de los botones)
+constexpr float kGap = 8.0f;     // entre casillas y entre botones
+constexpr float kSep = 22.0f;    // entre grupos (con un separador en el medio)
+constexpr float kPadX = 14.0f;   // margen de la barra a los costados
+constexpr float kRefHeight = 720.0f;
+
 } // namespace
 
 class GameHud : public IScript {
@@ -159,6 +191,7 @@ public:
         bind("hud_reset", {Key::F5});
         in.ClearAction("hud_click");
         in.BindMouseButton("hud_click", MouseButton::Left);
+        Resolve();
     }
 
     void OnUpdate(float dt) override {
@@ -166,136 +199,72 @@ public:
         GameFlow& flow = Flow();
         s.hudRects.clear();
         s.noticeTime += dt;
+        if (!m.root && !Resolve()) return;
+
         // GRAV_NOHUD=1: sin HUD, para capturar el tablero en una corrida
         // automatica (a 320x180 los carteles tapan media imagen).
         static const bool noHud = kit::AutoPick("GRAV_NOHUD") == 1;
         const bool visible = flow.InGame() && !flow.passage.Active() && s.loaded && !noHud;
         m_alpha = kit::Approach(m_alpha, visible ? 1.0f : 0.0f, visible ? 6.0f : 14.0f, dt);
-        if (m_alpha < 0.01f) return;
+        m.root->active = m_alpha >= 0.01f;
+        if (!m.root->active) return;
         const float a = m_alpha;
+        ApplyAlpha(a);
 
         InputActions& in = InputService::Actions();
         const float mx = in.CursorX(), my = in.CursorY();
         const bool click = visible && in.CursorInside() && in.Pressed("hud_click");
-
-        UiDrawList& ui = UiService::Frame();
         const float W = UiService::Width(), H = UiService::Height();
-        const float u = std::max(0.75f, H / 720.0f); // un "pixel de diseno" de 720p
-        const int ts = kit::TextScale();             // 3 a 720p
-        const int ss = std::max(1, ts - 1);          // 2: lo que se lee
-        const int xs = std::max(1, ts - 2);          // 1: solo las teclas (5x7 px a 720p)
+        const float u = H / kRefHeight; // la escala del canvas (SceneUi: alto / referencia)
 
         // ---------- Arriba a la izquierda: el nivel ----------
-        {
-            float x = std::floor(28.0f * u), y = std::floor(24.0f * u);
-            char head[32];
-            std::snprintf(head, sizeof(head), "LEVEL %02d / %02d", s.levelIndex + 1, s.levelCount);
-            ui.AddText(x, y, head, kit::Dim(a), ss);
-            y += kit::TextH(ss) + 12.0f * u;
-            const std::string title = s.board.title.empty() ? std::string("UNTITLED") : s.board.title;
-            ui.AddText(x, y, title, kit::White(a), ts);
-            y += kit::TextH(ts) + 12.0f * u;
-            const std::string stats = "MOVES " + std::to_string(s.moves) + "     " + Clock(s.elapsed);
-            ui.AddText(x, y, stats, kit::Faint(a), ss);
-            if (!s.board.hint.empty()) {
-                y += kit::TextH(ss) + 14.0f * u;
-                ui.AddText(x, y, s.board.hint, kit::Faint(a), ss);
-            }
-        }
-        if (flow.hasMenu) {
-            const char* text = "ESC  MENU";
-            ui.AddText(W - kit::TextW(text, ss) - 28.0f * u, 24.0f * u, text, kit::Faint(a), ss);
-        }
-        {
-            // La camara, que no tiene boton: si no se dice, no se descubre.
-            const char* cam = "RIGHT BUTTON  ORBIT     WHEEL OR Q E  ZOOM";
-            ui.AddText(W - kit::TextW(cam, xs) - 28.0f * u, 24.0f * u + kit::TextH(ss) + 10.0f * u, cam, kit::Faint(a), xs);
-        }
+        char head[32];
+        std::snprintf(head, sizeof(head), "LEVEL %02d / %02d", s.levelIndex + 1, s.levelCount);
+        Text(m.header, head);
+        Text(m.title, s.board.title.empty() ? std::string("UNTITLED") : s.board.title);
+        Text(m.stats, "MOVES " + std::to_string(s.moves) + "     " + Clock(s.elapsed));
+        Text(m.hint, s.board.hint);
+        Show(m.hint, !s.board.hint.empty());
+        Show(m.menu, flow.hasMenu);
 
         // ---------- Arriba al centro: que hizo la luz ----------
-        DrawStatus(ui, s, W, u, ts, ss, a);
+        UpdateStatus(s, a);
 
         // ---------- Abajo: inventario | herramientas | luz ----------
-        const float slot = std::floor(60.0f * u), gap = std::floor(8.0f * u), sep = std::floor(22.0f * u);
-        // Los botones, del ancho de su texto mas largo: a 720p "RESTART" no
-        // entraba en 104 px y se salia del recuadro.
-        const float btnH = slot, btnW = std::floor(kit::TextW("RESTART", ss) + 22.0f * u);
         std::vector<Shape> shapes;
         int placedByPlayer[kShapeCount] = {};
         for (const Figure& f : s.board.figures)
             if (!f.fixed) ++placedByPlayer[static_cast<int>(f.shape)];
         for (int i = 0; i < kShapeCount; ++i)
             if (s.board.inventory[i] + placedByPlayer[i] > 0) shapes.push_back(static_cast<Shape>(i));
-
-        const int tools = 2, controls = 4;
-        const float total = shapes.size() * (slot + gap) - (shapes.empty() ? 0 : gap) + sep + tools * (btnW + gap) - gap + sep +
-                            controls * (btnW + gap) - gap;
-        float x = std::floor((W - total) * 0.5f);
-        const float y = std::floor(H - slot - 26.0f * u);
-
-        // El fondo de la barra: un velo apenas, para que las lineas del mundo
-        // no crucen los dibujos de las casillas.
-        const UiRect bar{x - 14.0f * u, y - 12.0f * u, total + 28.0f * u, slot + 24.0f * u};
-        ui.AddRect(bar, kit::Black(0.72f * a));
-        ui.AddLine(bar.x, bar.y, bar.x + bar.width, bar.y, kit::Faint(0.6f * a), 1.0f);
-        s.hudRects.push_back({bar.x, bar.y, bar.width, bar.height});
+        Layout(shapes.size());
 
         std::string describe;
-        for (size_t i = 0; i < shapes.size(); ++i) {
-            const Shape sh = shapes[i];
-            const int left = s.board.inventory[static_cast<int>(sh)];
-            const bool sel = s.tool == Tool::Place && s.shape == sh;
-            const UiRect r{x, y, slot, slot};
-            const bool hover = kit::Inside(r, mx, my);
-            if ((hover && click) || (i < 9 && in.Pressed(SlotAction(static_cast<int>(i))))) {
-                if (!sel) gameaudio::Play("Game/piece_pick");
-                s.tool = Tool::Place;
-                s.shape = sh;
-            }
-            const float k = left > 0 ? 1.0f : 0.35f;
-            ui.AddRect(r, sel ? kit::Mix(kit::Black(a), kit::Beam(a), 0.12f) : kit::Black(0.0f));
-            ui.AddRectOutline(r, sel ? kit::Beam(a) : hover ? kit::Dim(a) : kit::Faint(a), sel ? 2.0f : 1.0f);
-            Icon(ui, sh, r.x + slot * 0.5f, r.y + slot * 0.42f, slot * 0.30f, sel ? kit::White(a * k) : kit::Dim(a * k), std::max(1.0f, std::floor(1.5f * u)));
-            if (i < 9) ui.AddText(r.x + 4.0f * u, r.y + 4.0f * u, std::to_string(i + 1), kit::Faint(a), xs);
-            const std::string count = "x" + std::to_string(left);
-            ui.AddText(r.x + slot - kit::TextW(count, ss) - 4.0f * u, r.y + slot - kit::TextH(ss) - 4.0f * u, count,
-                       left > 0 ? (sel ? kit::Beam(a) : kit::Dim(a)) : kit::Faint(a), ss);
-            if (hover) describe = std::string(Info(sh).label) + "  -  " + RuleOf(sh);
-            if (sel && sh == Shape::Wormhole && left % 2 == 1) describe = "WORMHOLE  -  PLACE THE OTHER PIT: ON A CYAN PLANE, WHERE THE LIGHT SHOULD EXIT";
-            x += slot + gap;
-        }
-        x += sep - gap;
-        Separator(ui, x - sep * 0.5f, y, slot, a);
+        const UiRect bar = RectOf(m.bar, W, H);
+        const UiRect cells = RectOf(m.cells, W, H);
+        s.hudRects.push_back({bar.x, bar.y, bar.width, bar.height});
+        DrawSlots(s, shapes, cells, u, mx, my, click, a, describe);
 
         // Las herramientas.
-        if (Button(ui, x, y, btnW, btnH, "ROTATE", "R", s.tool == Tool::Rotate, mx, my, click, a) || in.Pressed("hud_rotate")) {
+        if (Pressed(m.rotate, "hud_rotate")) {
             if (s.tool != Tool::Rotate) gameaudio::Play("Game/piece_pick");
             s.tool = Tool::Rotate;
         }
-        if (kit::Inside(UiRect{x, y, btnW, btnH}, mx, my)) describe = "ROTATE  -  CLICK ONE OF YOUR PIECES: IT MOVES TO ITS NEXT POSE";
-        x += btnW + gap;
-        if (Button(ui, x, y, btnW, btnH, "REMOVE", "X", s.tool == Tool::Remove, mx, my, click, a) || in.Pressed("hud_remove")) {
+        if (Pressed(m.remove, "hud_remove")) {
             if (s.tool != Tool::Remove) gameaudio::Play("Game/piece_pick");
             s.tool = Tool::Remove;
         }
-        if (kit::Inside(UiRect{x, y, btnW, btnH}, mx, my)) describe = "REMOVE  -  CLICK ONE OF YOUR PIECES: IT GOES BACK TO THE INVENTORY";
-        x += btnW + gap + sep - gap;
-        Separator(ui, x - sep * 0.5f, y, slot, a);
 
         // La luz y la partida.
-        if (Button(ui, x, y, btnW, btnH, "UNDO", "Z", false, mx, my, click, a) || in.Pressed("hud_undo"))
-        {
+        if (Pressed(m.undo, "hud_undo")) {
             if (s.Undo()) gameaudio::Play("Game/undo");
             else {
                 s.Notice(s.solved ? "ALREADY SOLVED" : "NOTHING TO UNDO");
                 gameaudio::Play("Ui/ui_denied");
             }
         }
-        x += btnW + gap;
-        if (Button(ui, x, y, btnW, btnH, s.paused ? "RESUME" : "PAUSE", "SPC", s.paused, mx, my, click, a) || in.Pressed("hud_pause"))
-            s.paused = !s.paused;
-        x += btnW + gap;
-        if (Button(ui, x, y, btnW, btnH, "STEP", "F", false, mx, my, click, a) || in.Pressed("hud_step")) {
+        if (Pressed(m.pause, "hud_pause")) s.paused = !s.paused;
+        if (Pressed(m.step, "hud_step")) {
             // Un tramo entero: hasta el final de la proxima superficie.
             gameaudio::SuppressPauseSound() = true;
             gameaudio::Play("Game/step");
@@ -306,12 +275,25 @@ public:
                     break;
                 }
         }
-        if (kit::Inside(UiRect{x, y, btnW, btnH}, mx, my)) describe = "STEP  -  PAUSE AND ADVANCE THE LIGHT ONE SURFACE";
-        x += btnW + gap;
-        if (Button(ui, x, y, btnW, btnH, "RESTART", "F5", false, mx, my, click, a) || in.Pressed("hud_reset")) {
+        if (Pressed(m.reset, "hud_reset")) {
             s.resetRequested = true;
             gameaudio::Play("Game/restart");
         }
+        Text(m.pauseText, s.paused ? "RESUME" : "PAUSE");
+
+        // El estado de cada boton: elegido (borde de la luz) o con el cursor
+        // encima (borde y texto mas claros). Despues de los clics, para que el
+        // boton recien apretado ya salga elegido este frame.
+        PaintButton(m.rotate, m.rotateText, s.tool == Tool::Rotate, a);
+        PaintButton(m.remove, m.removeText, s.tool == Tool::Remove, a);
+        PaintButton(m.undo, m.undoText, false, a);
+        PaintButton(m.pause, m.pauseText, s.paused, a);
+        PaintButton(m.step, m.stepText, false, a);
+        PaintButton(m.reset, m.resetText, false, a);
+
+        if (Hovered(m.rotate)) describe = "ROTATE  -  CLICK ONE OF YOUR PIECES: IT MOVES TO ITS NEXT POSE";
+        if (Hovered(m.remove)) describe = "REMOVE  -  CLICK ONE OF YOUR PIECES: IT GOES BACK TO THE INVENTORY";
+        if (Hovered(m.step)) describe = "STEP  -  PAUSE AND ADVANCE THE LIGHT ONE SURFACE";
 
         // La linea de arriba de la barra: lo que se esta por hacer, o lo que
         // hay bajo el cursor. Es como se aprende una pieza nueva sin manual.
@@ -324,45 +306,187 @@ public:
             else if (s.tool == Tool::Rotate) describe = "ROTATE  -  CLICK ONE OF YOUR PIECES: IT MOVES TO ITS NEXT POSE";
             else describe = "REMOVE  -  CLICK ONE OF YOUR PIECES: IT GOES BACK TO THE INVENTORY";
         }
-        kit::TextCentered(ui, W * 0.5f, bar.y - 16.0f * u - kit::TextH(ss) * 0.5f, describe, kit::Dim(a), ss);
+        Text(m.describe, describe);
 
-        // El aviso: arriba de la descripcion, en rojo, y se va solo.
-        if (!s.notice.empty() && s.noticeTime < 2.2f) {
+        // El aviso: arriba de la descripcion, en rojo, y se va solo. El ancho
+        // es el del texto, asi que lo pone el puente.
+        const bool notice = !s.notice.empty() && s.noticeTime < 2.2f;
+        Show(m.notice, notice);
+        if (notice) {
             const float na = a * kit::Saturate((2.2f - s.noticeTime) / 0.4f) * kit::Saturate(s.noticeTime / 0.08f);
-            const float w = kit::TextW(s.notice, ss) + 32.0f * u, h = kit::TextH(ss) + 18.0f * u;
-            const UiRect r{std::floor((W - w) * 0.5f), std::floor(bar.y - 48.0f * u - h), w, h};
-            ui.AddRect(r, kit::Black(0.85f * na));
-            ui.AddRectOutline(r, kit::Red(na), 1.0f);
-            ui.AddTextCentered(r, s.notice, kit::White(na), ss);
+            Text(m.noticeText, s.notice);
+            if (UiTransform* t = TransformOf(m.notice))
+                t->width = static_cast<float>(MeasureTextWidth(s.notice, 2)) + 32.0f;
+            if (UiPanel* p = GetComponent<UiPanel>(*m.notice)) {
+                p->color = WithAlpha(Base(&p->color), na);
+                p->borderColor = WithAlpha(Base(&p->borderColor), na);
+            }
+            if (UiLabel* l = LabelOf(m.noticeText)) l->color = WithAlpha(Base(&l->color), na);
         }
     }
 
 private:
-    static const char* SlotAction(int i) {
-        static const char* names[9] = {"hud_slot1", "hud_slot2", "hud_slot3", "hud_slot4", "hud_slot5",
-                                       "hud_slot6", "hud_slot7", "hud_slot8", "hud_slot9"};
-        return names[i];
+    // Los nodos del arbol HUD, por ruta (docs/hud-jerarquia.md). Por ruta y no
+    // por ObjectField: son veinte, y la ruta escrita una vez aca es mas facil de
+    // mantener que veinte ranuras del Inspector que hay que volver a arrastrar
+    // si alguien rehace el arbol.
+    struct Nodes {
+        GameObject* root = nullptr;
+        GameObject *header = nullptr, *title = nullptr, *stats = nullptr, *hint = nullptr;
+        GameObject *menu = nullptr;
+        GameObject *status = nullptr, *statusDetail = nullptr;
+        GameObject *describe = nullptr, *notice = nullptr, *noticeText = nullptr;
+        GameObject *bar = nullptr, *cells = nullptr, *sep1 = nullptr, *sep2 = nullptr, *tools = nullptr, *controls = nullptr;
+        GameObject *rotate = nullptr, *remove = nullptr, *undo = nullptr, *pause = nullptr, *step = nullptr, *reset = nullptr;
+        GameObject *rotateText = nullptr, *removeText = nullptr, *undoText = nullptr, *pauseText = nullptr, *stepText = nullptr,
+                   *resetText = nullptr;
+    } m;
+
+    bool Resolve() {
+        auto& roots = SceneService::MutableRoots();
+        auto find = [&](const char* path) {
+            GameObject* n = FindByPath(roots, path);
+            if (!n && !m_warned) Log::Warn(L"GameHud: falta '" + Utf8ToWide(path) + L"' en la escena (ver docs/hud-jerarquia.md)");
+            return n;
+        };
+        m = Nodes{};
+        m.root = find("HUD");
+        if (!m.root) {
+            m_warned = true;
+            return false;
+        }
+        m.header = find("HUD/Nivel/Cabecera");
+        m.title = find("HUD/Nivel/Titulo");
+        m.stats = find("HUD/Nivel/Jugadas");
+        m.hint = find("HUD/Nivel/Pista");
+        m.menu = find("HUD/Esquina/Menu");
+        m.status = find("HUD/Estado/Texto");
+        m.statusDetail = find("HUD/Estado/Detalle");
+        m.describe = find("HUD/Descripcion");
+        m.notice = find("HUD/Aviso");
+        m.noticeText = find("HUD/Aviso/Texto");
+        m.bar = find("HUD/Barra");
+        m.cells = find("HUD/Barra/Casillas");
+        m.sep1 = find("HUD/Barra/Separador1");
+        m.sep2 = find("HUD/Barra/Separador2");
+        m.tools = find("HUD/Barra/Herramientas");
+        m.controls = find("HUD/Barra/Controles");
+        m.rotate = find("HUD/Barra/Herramientas/Rotar");
+        m.remove = find("HUD/Barra/Herramientas/Quitar");
+        m.undo = find("HUD/Barra/Controles/Deshacer");
+        m.pause = find("HUD/Barra/Controles/Pausa");
+        m.step = find("HUD/Barra/Controles/Paso");
+        m.reset = find("HUD/Barra/Controles/Reiniciar");
+        m.rotateText = find("HUD/Barra/Herramientas/Rotar/Texto");
+        m.removeText = find("HUD/Barra/Herramientas/Quitar/Texto");
+        m.undoText = find("HUD/Barra/Controles/Deshacer/Texto");
+        m.pauseText = find("HUD/Barra/Controles/Pausa/Texto");
+        m.stepText = find("HUD/Barra/Controles/Paso/Texto");
+        m.resetText = find("HUD/Barra/Controles/Reiniciar/Texto");
+        m_warned = true;
+        m_base.clear();
+        Snapshot(*m.root);
+        return true;
     }
 
-    static void Separator(UiDrawList& ui, float x, float y, float h, float a) {
-        ui.AddLine(std::floor(x), y + h * 0.15f, std::floor(x), y + h * 0.85f, kit::Faint(0.7f * a), 1.0f);
+    // --- El alfa del HUD ---
+
+    // El color de cada componente tal como lo dejo el Inspector (la escena de
+    // Play es una copia: estos punteros viven lo que vive el Play).
+    void Snapshot(GameObject& n) {
+        if (UiPanel* p = GetComponent<UiPanel>(n)) {
+            m_base[&p->color] = p->color;
+            m_base[&p->borderColor] = p->borderColor;
+        }
+        if (UiLabel* l = GetComponent<UiLabel>(n)) m_base[&l->color] = l->color;
+        if (UiButton* b = GetComponent<UiButton>(n)) {
+            for (UiColor* c : {&b->color, &b->hoverColor, &b->pressedColor, &b->disabledColor, &b->borderColor}) m_base[c] = *c;
+        }
+        for (auto& child : n.children) Snapshot(*child);
+    }
+    UiColor Base(UiColor* c) const {
+        const auto it = m_base.find(c);
+        return it != m_base.end() ? it->second : *c;
+    }
+    void ApplyAlpha(float a) {
+        for (auto& [ptr, base] : m_base) *ptr = WithAlpha(base, a);
     }
 
-    // Un boton: el nombre al centro y la tecla, chica, arriba a la izquierda.
-    // Devuelve si se hizo clic.
-    static bool Button(UiDrawList& ui, float x, float y, float w, float h, const char* label, const char* key, bool on, float mx, float my, bool click,
-                       float a) {
-        const UiRect r{x, y, w, h};
-        const bool hover = kit::Inside(r, mx, my);
-        const int ts = std::max(1, kit::TextScale() - 1), ks = std::max(1, kit::TextScale() - 2);
-        if (on) ui.AddRect(r, kit::Mix(kit::Black(a), kit::Beam(a), 0.12f));
-        ui.AddRectOutline(r, on ? kit::Beam(a) : hover ? kit::Dim(a) : kit::Faint(a), on ? 2.0f : 1.0f);
-        ui.AddTextCentered(UiRect{r.x, r.y + h * 0.12f, r.width, r.height}, label, on ? kit::White(a) : hover ? kit::White(a) : kit::Dim(a), ts);
-        ui.AddText(r.x + 4.0f, r.y + 4.0f, key, kit::Faint(a), ks);
-        return hover && click;
+    // --- Comodidades: todas aceptan un nodo que falta (ya se aviso al buscarlo) ---
+
+    static UiLabel* LabelOf(GameObject* n) { return n ? GetComponent<UiLabel>(*n) : nullptr; }
+    static UiTransform* TransformOf(GameObject* n) { return n ? GetComponent<UiTransform>(*n) : nullptr; }
+    static void Text(GameObject* n, const std::string& text) {
+        if (n) SceneUi::SetText(*n, text);
+    }
+    static void Show(GameObject* n, bool on) {
+        if (n) n->active = on;
+    }
+    static bool Hovered(GameObject* n) {
+        const UiButton* b = n ? GetComponent<UiButton>(*n) : nullptr;
+        return b && b->hovered;
+    }
+    // El boton se apreto (clic completo, ver UiButton) o su tecla.
+    static bool Pressed(GameObject* n, const char* action) {
+        return (n && SceneUi::Clicked(*n)) || InputService::Actions().Pressed(action);
     }
 
-    void DrawStatus(UiDrawList& ui, const PuzzleSession& s, float W, float u, int ts, int ss, float a) {
+    // Elegido: fondo con un toque de la luz y borde de la luz, texto blanco.
+    // Con el cursor encima: borde y texto mas claros. Si no, lo de la escena.
+    void PaintButton(GameObject* n, GameObject* text, bool on, float a) {
+        UiButton* b = n ? GetComponent<UiButton>(*n) : nullptr;
+        if (!b) return;
+        UiLabel* l = LabelOf(text);
+        if (on) {
+            const UiColor fill = kit::Mix(kit::Black(a), kit::Beam(a), 0.12f);
+            b->color = b->hoverColor = fill;
+            b->borderColor = kit::Beam(a);
+            b->borderThickness = 2.0f;
+            if (l) l->color = kit::White(a);
+            return;
+        }
+        b->borderThickness = 1.0f;
+        if (b->hovered) {
+            b->borderColor = kit::Dim(a);
+            if (l) l->color = kit::White(a);
+        }
+    }
+
+    // El rectangulo en pantalla de un nodo del HUD: la misma cuenta que SceneUi
+    // (LayoutUiRect de la raiz para abajo, con la escala del canvas), asi las
+    // casillas caen exactamente en el hueco que la barra les deja.
+    UiRect RectOf(GameObject* n, float W, float H) const {
+        std::vector<GameObject*> chain;
+        for (GameObject* p = n; p; p = p->parent) chain.push_back(p);
+        UiRect rect{0.0f, 0.0f, W, H};
+        float scale = 1.0f;
+        for (auto it = chain.rbegin(); it != chain.rend(); ++it) {
+            if (const UiCanvas* c = GetComponent<UiCanvas>(**it)) scale = c->referenceHeight > 0.0f ? H / c->referenceHeight : 1.0f;
+            if (const UiTransform* t = GetComponent<UiTransform>(**it)) rect = LayoutUiRect(rect, *t, scale);
+        }
+        return rect;
+    }
+
+    // Los anchos que dependen de cuantas piezas hay: el hueco de las casillas,
+    // la barra entera y donde arrancan los grupos de botones. En unidades del
+    // canvas; los anchos de los grupos los toma de la escena.
+    void Layout(size_t count) {
+        UiTransform* cells = TransformOf(m.cells);
+        UiTransform* tools = TransformOf(m.tools);
+        UiTransform* controls = TransformOf(m.controls);
+        UiTransform* bar = TransformOf(m.bar);
+        if (!cells || !tools || !controls || !bar) return;
+        const float cellsW = count ? count * (kSlot + kGap) - kGap : 0.0f;
+        cells->x = kPadX;
+        cells->width = cellsW;
+        tools->x = kPadX + cellsW + kSep;
+        controls->x = tools->x + tools->width + kSep;
+        if (UiTransform* s1 = TransformOf(m.sep1)) s1->x = std::floor(tools->x - kSep * 0.5f);
+        if (UiTransform* s2 = TransformOf(m.sep2)) s2->x = std::floor(controls->x - kSep * 0.5f);
+        bar->width = controls->x + controls->width + kPadX;
+    }
+
+    void UpdateStatus(const PuzzleSession& s, float a) {
         std::string text;
         UiColor color = kit::Dim(a);
         if (s.solved) {
@@ -383,17 +507,62 @@ private:
         } else if (s.paused) {
             text = "PAUSED";
         }
-        if (text.empty()) return;
-        const int scale = s.solved ? ts + 1 : ss;
-        const float y = 28.0f * u + kit::TextH(scale) * 0.5f;
-        kit::TextCentered(ui, W * 0.5f, y, text, color, scale);
-        if (s.solved) {
-            const std::string sub = std::to_string(s.moves) + (s.moves == 1 ? " MOVE" : " MOVES") + "  -  " + Clock(s.elapsed);
-            kit::TextCentered(ui, W * 0.5f, y + kit::TextH(scale) * 0.5f + 10.0f * u + kit::TextH(ss) * 0.5f, sub, kit::Dim(a), ss);
+        Show(m.status, !text.empty());
+        Text(m.status, text);
+        if (UiLabel* l = LabelOf(m.status)) {
+            l->color = color;
+            // Resuelto, un escalon mas grande: es el final de la partida.
+            l->scale = s.solved ? 4 : 2;
+        }
+        Show(m.statusDetail, s.solved);
+        if (s.solved)
+            Text(m.statusDetail, std::to_string(s.moves) + (s.moves == 1 ? " MOVE" : " MOVES") + "  -  " + Clock(s.elapsed));
+    }
+
+    // Las casillas de piezas, dibujadas en el hueco de la barra. `u` es la
+    // escala del canvas: las medidas son las de 720p, como el resto del HUD.
+    void DrawSlots(PuzzleSession& s, const std::vector<Shape>& shapes, const UiRect& cells, float u, float mx, float my, bool click, float a,
+                   std::string& describe) {
+        UiDrawList& ui = UiService::Frame();
+        InputActions& in = InputService::Actions();
+        // Los textos con la misma regla que las etiquetas del canvas (SceneUi):
+        // escala de diseno por la del canvas, redondeada.
+        const int ss = std::max(1, static_cast<int>(std::lround(2.0f * u)));
+        const int xs = std::max(1, static_cast<int>(std::lround(1.0f * u)));
+        const float slot = std::floor(kSlot * u), step = (kSlot + kGap) * u;
+        for (size_t i = 0; i < shapes.size(); ++i) {
+            const Shape sh = shapes[i];
+            const int left = s.board.inventory[static_cast<int>(sh)];
+            const bool sel = s.tool == Tool::Place && s.shape == sh;
+            const UiRect r{std::floor(cells.x + i * step), std::floor(cells.y), slot, slot};
+            const bool hover = kit::Inside(r, mx, my);
+            if ((hover && click) || (i < 9 && in.Pressed(SlotAction(static_cast<int>(i))))) {
+                if (!sel) gameaudio::Play("Game/piece_pick");
+                s.tool = Tool::Place;
+                s.shape = sh;
+            }
+            const float k = left > 0 ? 1.0f : 0.35f;
+            ui.AddRect(r, sel ? kit::Mix(kit::Black(a), kit::Beam(a), 0.12f) : kit::Black(0.0f));
+            ui.AddRectOutline(r, sel ? kit::Beam(a) : hover ? kit::Dim(a) : kit::Faint(a), sel ? 2.0f : 1.0f);
+            Icon(ui, sh, r.x + slot * 0.5f, r.y + slot * 0.42f, slot * 0.30f, sel ? kit::White(a * k) : kit::Dim(a * k), std::max(1.0f, std::floor(1.5f * u)));
+            if (i < 9) ui.AddText(r.x + 4.0f * u, r.y + 4.0f * u, std::to_string(i + 1), kit::Faint(a), xs);
+            const std::string count = "x" + std::to_string(left);
+            ui.AddText(r.x + slot - kit::TextW(count, ss) - 4.0f * u, r.y + slot - kit::TextH(ss) - 4.0f * u, count,
+                       left > 0 ? (sel ? kit::Beam(a) : kit::Dim(a)) : kit::Faint(a), ss);
+            if (hover) describe = std::string(Info(sh).label) + "  -  " + RuleOf(sh);
+            if (sel && sh == Shape::Wormhole && left % 2 == 1) describe = "WORMHOLE  -  PLACE THE OTHER PIT: ON A CYAN PLANE, WHERE THE LIGHT SHOULD EXIT";
         }
     }
 
+    static const char* SlotAction(int i) {
+        static const char* names[9] = {"hud_slot1", "hud_slot2", "hud_slot3", "hud_slot4", "hud_slot5",
+                                       "hud_slot6", "hud_slot7", "hud_slot8", "hud_slot9"};
+        return names[i];
+    }
+
+    std::unordered_map<UiColor*, UiColor> m_base;
     float m_alpha = 0.0f;
+    bool m_warned = false;
 };
 
 STRACE_REGISTER_SCRIPT(GameHud)
