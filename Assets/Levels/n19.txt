@@ -1,0 +1,24 @@
+; NIVEL 19 - EL PUENTE (24/10/2026, hecho a mano)
+;
+; La llegada esta del lado contrario al que mira la luz. Muy arriba cuelga un
+; puente cabeza abajo que cruza todo el vacio de vuelta: para ir hacia adelante,
+; hacia atras. En su centro cuelga un agujero negro. La ESFERA DE 3 tira la luz
+; de costado a una esfera chica, esta la sube a un CUBO colgado del puente, y la
+; franja del cubo la manda por el borde del puente, lejos del horizonte.
+title THE BRIDGE
+hint TO GO FORWARD, SOMETIMES YOU HAVE TO GO BACK
+rules 3
+size 10 6 5
+start floor 6 0 1 8 0 3
+source 6 0 2 right
+panel ceiling 0 2 0 8 2 4
+fixed blackhole 4 2 2 down
+end left 0 0 0 0 2 4
+receiver 0 0 0
+inventory sphere3 1 pyramid 2 sphere 1 cube 1 torus 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place sphere3 8 1 2
+;! place sphere 8 1 0
+;! place cube 8 2 0 -z

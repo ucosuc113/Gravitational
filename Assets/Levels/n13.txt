@@ -1,0 +1,25 @@
+; NIVEL 13 - HORIZONTE: los agujeros negros (24/10/2026, hecho a mano)
+;
+; Al final del piso se levanta una pared alta que flota, y en su cara, a media
+; altura, una fila de agujeros negros. La luz sube sola por la pared y cae en el
+; horizonte. Hay que esquivarlos SOBRE la pared: dos piramides apoyadas en ella
+; la corren de costado, mas alla de la fila, y la vuelven a subir. Arriba la
+; pared se pliega en la llegada.
+title HORIZON
+hint WHAT TOUCHES A BLACK HOLE NEVER RETURNS. GO AROUND IT
+rules 3
+size 6 7 5
+start floor 0 0 1 3 0 3
+source 0 0 2 right
+panel right 3 0 0 3 5 4
+fixed blackhole 3 3 2 left
+fixed blackhole 3 3 1 left
+fixed blackhole 3 3 3 left
+end floor 4 6 0 5 6 4
+receiver 5 6 4
+inventory pyramid 2 sphere 1 cube 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place pyramid 3 0 2 left
+;! place pyramid 3 0 4 right

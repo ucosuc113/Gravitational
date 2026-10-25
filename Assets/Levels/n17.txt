@@ -1,0 +1,24 @@
+; NIVEL 17 - CAMINO DE CINTAS (24/10/2026, hecho a mano)
+;
+; La luz cambia de plano tres veces, y cada vez con una cinta distinta, a un
+; plano de otra orientacion: la TORSION la pasa del piso a una cerca sin
+; doblarla, la CURVA la sube de la cerca a una pared que tiene adelante, la luz
+; da la vuelta por arriba a un estante, y la RAMPA la levanta a la llegada.
+title RIBBON ROAD
+hint THREE RIBBONS, THREE CHANGES OF PLANE
+rules 3
+size 9 8 3
+start floor 0 0 0 3 0 0
+source 0 0 0 right
+panel back 3 0 0 5 2 0
+panel right 5 1 0 5 4 0
+panel floor 6 5 0 8 5 2
+end right 7 6 0 7 7 2
+receiver 7 7 0
+inventory twist 1 bend 1 ramp 1 sphere 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place twist 1 0 0 right up
+;! place bend 5 0 0 right front
+;! place ramp 6 5 0 right up

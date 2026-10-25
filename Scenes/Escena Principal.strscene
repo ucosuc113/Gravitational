@@ -1,0 +1,1613 @@
+{
+  "environment": {
+    "ambientColor": [
+      0.11336034536361694,
+      0.11336034536361694,
+      0.11336034536361694
+    ],
+    "ambientEnergy": 1.0,
+    "ambientGround": [
+      0.11999999731779099,
+      0.11999999731779099,
+      0.14000000059604645
+    ],
+    "background": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "exposure": 1.0,
+    "hemisphere": false,
+    "paint": {
+      "bristle": 0.5,
+      "detail": 0.6000000238418579,
+      "strength": 1.0,
+      "stroke": 0.12999999523162842
+    },
+    "postProcess": "",
+    "tonemap": "linear",
+    "uiOverPost": false
+  },
+  "roots": [
+    {
+      "active": true,
+      "camera": {
+        "aperture": 0.0,
+        "far": 1000.0,
+        "focusDistance": 5.0,
+        "fovY": 60.0,
+        "grade": {
+          "contrast": 1.100000023841858,
+          "enabled": true,
+          "exposure": 0.0,
+          "gain": [
+            -0.05000000074505806,
+            -0.009999999776482582,
+            0.029999999329447746
+          ],
+          "gamma": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "highlights": -0.07999999821186066,
+          "hue": 0.0,
+          "lift": [
+            -0.03999999910593033,
+            -0.07000000029802322,
+            -0.019999999552965164
+          ],
+          "mix": 1.0,
+          "pivot": 0.4000000059604645,
+          "saturation": 1.0,
+          "shadows": 0.0,
+          "temperature": 0.0,
+          "tint": 0.0,
+          "vibrance": 0.15000000596046448
+        },
+        "near": 0.10000000149011612,
+        "orthoHalfHeight": 10.0
+      },
+      "children": [],
+      "faceCulling": true,
+      "name": "Camara",
+      "position": [
+        0.04914887249469757,
+        5.681481838226318,
+        -5.631904125213623
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        45.25,
+        -0.5,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scriptFields": [
+        {
+          "field": "pivot",
+          "script": "OrbitCamera",
+          "value": "Pivote"
+        },
+        {
+          "field": "distance",
+          "script": "OrbitCamera",
+          "value": "8"
+        },
+        {
+          "field": "startPitch",
+          "script": "OrbitCamera",
+          "value": "30"
+        },
+        {
+          "field": "startYaw",
+          "script": "OrbitCamera",
+          "value": "30"
+        },
+        {
+          "field": "ghost",
+          "script": "FigureBuilder",
+          "value": "Nivel/Fantasma"
+        },
+        {
+          "field": "figures",
+          "script": "FigureBuilder",
+          "value": "Nivel/Figuras"
+        },
+        {
+          "field": "startPlane",
+          "script": "FigureBuilder",
+          "value": "Nivel/PlanoSalida"
+        },
+        {
+          "field": "endPlane",
+          "script": "FigureBuilder",
+          "value": "Nivel/PlanoLlegada"
+        }
+      ],
+      "scripts": [
+        "OrbitCamera",
+        "FigureBuilder",
+        "CameraGrade"
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [],
+      "faceCulling": true,
+      "name": "Pivote",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [
+        {
+          "active": true,
+          "children": [],
+          "components": [
+            {
+              "anchor": [
+                0,
+                0
+              ],
+              "pos": [
+                24.0,
+                24.0
+              ],
+              "size": [
+                640.0,
+                40.0
+              ],
+              "type": "UiTransform"
+            },
+            {
+              "align": [
+                0,
+                1
+              ],
+              "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "scale": 2,
+              "text": "NIVEL 1/3   JUGADAS: 1",
+              "type": "UiLabel",
+              "wrap": false
+            }
+          ],
+          "faceCulling": true,
+          "name": "Pasos",
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "primitive": "Empty",
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "children": [
+            {
+              "active": true,
+              "children": [],
+              "components": [
+                {
+                  "anchor": [
+                    1,
+                    1
+                  ],
+                  "pos": [
+                    0.0,
+                    0.0
+                  ],
+                  "size": [
+                    220.0,
+                    56.0
+                  ],
+                  "type": "UiTransform"
+                },
+                {
+                  "border": 1.0,
+                  "borderColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "color": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    1.0
+                  ],
+                  "disabledColor": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.4000000059604645
+                  ],
+                  "hoverColor": [
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    1.0
+                  ],
+                  "interactable": true,
+                  "pressedColor": [
+                    0.550000011920929,
+                    0.07999999821186066,
+                    0.07999999821186066,
+                    1.0
+                  ],
+                  "type": "UiButton"
+                },
+                {
+                  "align": [
+                    1,
+                    1
+                  ],
+                  "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "scale": 2,
+                  "text": "SEGUIR",
+                  "type": "UiLabel",
+                  "wrap": false
+                }
+              ],
+              "faceCulling": true,
+              "name": "Pausa",
+              "position": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "primitive": "Empty",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            },
+            {
+              "active": true,
+              "children": [],
+              "components": [
+                {
+                  "anchor": [
+                    1,
+                    1
+                  ],
+                  "pos": [
+                    240.0,
+                    0.0
+                  ],
+                  "size": [
+                    220.0,
+                    56.0
+                  ],
+                  "type": "UiTransform"
+                },
+                {
+                  "border": 1.0,
+                  "borderColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "color": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    1.0
+                  ],
+                  "disabledColor": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.4000000059604645
+                  ],
+                  "hoverColor": [
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    1.0
+                  ],
+                  "interactable": true,
+                  "pressedColor": [
+                    0.550000011920929,
+                    0.07999999821186066,
+                    0.07999999821186066,
+                    1.0
+                  ],
+                  "type": "UiButton"
+                },
+                {
+                  "align": [
+                    1,
+                    1
+                  ],
+                  "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "scale": 2,
+                  "text": "PASO",
+                  "type": "UiLabel",
+                  "wrap": false
+                }
+              ],
+              "faceCulling": true,
+              "name": "Paso",
+              "position": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "primitive": "Empty",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            },
+            {
+              "active": true,
+              "children": [],
+              "components": [
+                {
+                  "anchor": [
+                    1,
+                    1
+                  ],
+                  "pos": [
+                    -240.0,
+                    0.0
+                  ],
+                  "size": [
+                    220.0,
+                    56.0
+                  ],
+                  "type": "UiTransform"
+                },
+                {
+                  "border": 1.0,
+                  "borderColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "color": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    1.0
+                  ],
+                  "disabledColor": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.4000000059604645
+                  ],
+                  "hoverColor": [
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    1.0
+                  ],
+                  "interactable": true,
+                  "pressedColor": [
+                    0.550000011920929,
+                    0.07999999821186066,
+                    0.07999999821186066,
+                    1.0
+                  ],
+                  "type": "UiButton"
+                },
+                {
+                  "align": [
+                    1,
+                    1
+                  ],
+                  "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "scale": 2,
+                  "text": "REINICIAR",
+                  "type": "UiLabel",
+                  "wrap": false
+                }
+              ],
+              "faceCulling": true,
+              "name": "Reiniciar",
+              "position": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "primitive": "Empty",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            }
+          ],
+          "components": [
+            {
+              "anchor": [
+                1,
+                2
+              ],
+              "pos": [
+                0.0,
+                24.0
+              ],
+              "size": [
+                740.0,
+                80.0
+              ],
+              "type": "UiTransform"
+            },
+            {
+              "border": 0.0,
+              "borderColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "color": [
+                0.0,
+                0.0,
+                0.0,
+                0.6000000238418579
+              ],
+              "type": "UiPanel"
+            }
+          ],
+          "faceCulling": true,
+          "name": "Controles",
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "primitive": "Empty",
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "children": [],
+          "components": [
+            {
+              "anchor": [
+                1,
+                0
+              ],
+              "pos": [
+                0.0,
+                24.0
+              ],
+              "size": [
+                1000.0,
+                40.0
+              ],
+              "type": "UiTransform"
+            },
+            {
+              "align": [
+                1,
+                1
+              ],
+              "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "scale": 2,
+              "text": "EN PAUSA",
+              "type": "UiLabel",
+              "wrap": false
+            }
+          ],
+          "faceCulling": true,
+          "name": "Estado",
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "primitive": "Empty",
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "children": [
+            {
+              "active": true,
+              "children": [],
+              "components": [
+                {
+                  "anchor": [
+                    1,
+                    0
+                  ],
+                  "pos": [
+                    0.0,
+                    20.0
+                  ],
+                  "size": [
+                    200.0,
+                    52.0
+                  ],
+                  "type": "UiTransform"
+                },
+                {
+                  "border": 1.0,
+                  "borderColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "color": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    1.0
+                  ],
+                  "disabledColor": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.4000000059604645
+                  ],
+                  "hoverColor": [
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    1.0
+                  ],
+                  "interactable": true,
+                  "pressedColor": [
+                    0.550000011920929,
+                    0.07999999821186066,
+                    0.07999999821186066,
+                    1.0
+                  ],
+                  "type": "UiButton"
+                },
+                {
+                  "align": [
+                    1,
+                    1
+                  ],
+                  "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "scale": 2,
+                  "text": "> ESFERA x2 <",
+                  "type": "UiLabel",
+                  "wrap": false
+                }
+              ],
+              "faceCulling": true,
+              "name": "Esfera",
+              "position": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "primitive": "Empty",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            },
+            {
+              "active": true,
+              "children": [],
+              "components": [
+                {
+                  "anchor": [
+                    1,
+                    0
+                  ],
+                  "pos": [
+                    0.0,
+                    86.0
+                  ],
+                  "size": [
+                    200.0,
+                    52.0
+                  ],
+                  "type": "UiTransform"
+                },
+                {
+                  "border": 1.0,
+                  "borderColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "color": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    1.0
+                  ],
+                  "disabledColor": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.4000000059604645
+                  ],
+                  "hoverColor": [
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    1.0
+                  ],
+                  "interactable": true,
+                  "pressedColor": [
+                    0.550000011920929,
+                    0.07999999821186066,
+                    0.07999999821186066,
+                    1.0
+                  ],
+                  "type": "UiButton"
+                },
+                {
+                  "align": [
+                    1,
+                    1
+                  ],
+                  "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "scale": 2,
+                  "text": "CUBO x0",
+                  "type": "UiLabel",
+                  "wrap": false
+                }
+              ],
+              "faceCulling": true,
+              "name": "Cubo",
+              "position": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "primitive": "Empty",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            },
+            {
+              "active": true,
+              "children": [],
+              "components": [
+                {
+                  "anchor": [
+                    1,
+                    0
+                  ],
+                  "pos": [
+                    0.0,
+                    152.0
+                  ],
+                  "size": [
+                    200.0,
+                    52.0
+                  ],
+                  "type": "UiTransform"
+                },
+                {
+                  "border": 1.0,
+                  "borderColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "color": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    1.0
+                  ],
+                  "disabledColor": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.4000000059604645
+                  ],
+                  "hoverColor": [
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    1.0
+                  ],
+                  "interactable": true,
+                  "pressedColor": [
+                    0.550000011920929,
+                    0.07999999821186066,
+                    0.07999999821186066,
+                    1.0
+                  ],
+                  "type": "UiButton"
+                },
+                {
+                  "align": [
+                    1,
+                    1
+                  ],
+                  "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "scale": 2,
+                  "text": "ROTAR",
+                  "type": "UiLabel",
+                  "wrap": false
+                }
+              ],
+              "faceCulling": true,
+              "name": "Rotar",
+              "position": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "primitive": "Empty",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            },
+            {
+              "active": true,
+              "children": [],
+              "components": [
+                {
+                  "anchor": [
+                    1,
+                    0
+                  ],
+                  "pos": [
+                    0.0,
+                    218.0
+                  ],
+                  "size": [
+                    200.0,
+                    52.0
+                  ],
+                  "type": "UiTransform"
+                },
+                {
+                  "border": 1.0,
+                  "borderColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "color": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    1.0
+                  ],
+                  "disabledColor": [
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.11999999731779099,
+                    0.4000000059604645
+                  ],
+                  "hoverColor": [
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    0.2199999988079071,
+                    1.0
+                  ],
+                  "interactable": true,
+                  "pressedColor": [
+                    0.550000011920929,
+                    0.07999999821186066,
+                    0.07999999821186066,
+                    1.0
+                  ],
+                  "type": "UiButton"
+                },
+                {
+                  "align": [
+                    1,
+                    1
+                  ],
+                  "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "scale": 2,
+                  "text": "QUITAR",
+                  "type": "UiLabel",
+                  "wrap": false
+                }
+              ],
+              "faceCulling": true,
+              "name": "Quitar",
+              "position": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "primitive": "Empty",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            }
+          ],
+          "components": [
+            {
+              "anchor": [
+                0,
+                1
+              ],
+              "pos": [
+                24.0,
+                0.0
+              ],
+              "size": [
+                240.0,
+                288.0
+              ],
+              "type": "UiTransform"
+            },
+            {
+              "border": 0.0,
+              "borderColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "color": [
+                0.0,
+                0.0,
+                0.0,
+                0.6000000238418579
+              ],
+              "type": "UiPanel"
+            }
+          ],
+          "faceCulling": true,
+          "name": "Herramientas",
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "primitive": "Empty",
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "staticForLighting": false
+        }
+      ],
+      "components": [
+        {
+          "referenceHeight": 720.0,
+          "type": "UiCanvas"
+        }
+      ],
+      "faceCulling": true,
+      "name": "HUD",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [],
+      "faceCulling": true,
+      "name": "Pruebas",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scripts": [
+        "GridCheck",
+        "TraceCheck",
+        "PickCheck"
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [
+        {
+          "active": true,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets\\Shaders\\Surface.strmat",
+          "name": "PlanoSalida",
+          "position": [
+            -1.5,
+            0.0,
+            0.0
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            0.0,
+            0.0,
+            -90.0
+          ],
+          "scale": [
+            1.5,
+            1.0,
+            1.5
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets\\Shaders\\Surface.strmat",
+          "name": "PlanoLlegada",
+          "position": [
+            1.5,
+            0.0,
+            0.0
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            0.0,
+            0.0,
+            90.0
+          ],
+          "scale": [
+            1.5,
+            1.0,
+            1.5
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "children": [
+            {
+              "active": true,
+              "children": [],
+              "faceCulling": true,
+              "material": "Assets/Materials/Figure.strmat",
+              "name": "Esfera 0 2 1",
+              "position": [
+                -1.0,
+                1.0,
+                0.0
+              ],
+              "primitive": "Sphere",
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "staticForLighting": false
+            }
+          ],
+          "faceCulling": true,
+          "name": "Figuras",
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "primitive": "Empty",
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": false,
+          "castShadows": false,
+          "children": [],
+          "faceCulling": true,
+          "material": "Assets/Materials/Ghost.strmat",
+          "name": "Fantasma",
+          "position": [
+            -1.0,
+            1.0,
+            -1.0
+          ],
+          "primitive": "Sphere",
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "staticForLighting": false
+        }
+      ],
+      "faceCulling": true,
+      "name": "Nivel",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [],
+      "faceCulling": true,
+      "light": {
+        "attenuation": 1.0,
+        "castsShadows": false,
+        "color": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "intensity": 1.0,
+        "range": 10.0,
+        "spotAngle": 45.0,
+        "static": false,
+        "type": "Directional"
+      },
+      "name": "Luz",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        50.0,
+        30.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [
+        {
+          "active": false,
+          "castShadows": false,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets/Materials/Sheet.strmat",
+          "name": "Paso_Lamina",
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            120.00000762939453,
+            30.000001907348633,
+            0.0
+          ],
+          "scale": [
+            2.0399999618530273,
+            1.0,
+            2.0399999618530273
+          ],
+          "staticForLighting": false
+        }
+      ],
+      "faceCulling": true,
+      "name": "Puzzle",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scriptFields": [
+        {
+          "field": "startPlane",
+          "script": "PuzzleDirector",
+          "value": "Nivel/PlanoSalida"
+        },
+        {
+          "field": "endPlane",
+          "script": "PuzzleDirector",
+          "value": "Nivel/PlanoLlegada"
+        },
+        {
+          "field": "figures",
+          "script": "PuzzleDirector",
+          "value": "Nivel/Figuras"
+        },
+        {
+          "field": "statsLabel",
+          "script": "PuzzleDirector",
+          "value": "HUD/Pasos"
+        },
+        {
+          "field": "statusLabel",
+          "script": "PuzzleDirector",
+          "value": "HUD/Estado"
+        },
+        {
+          "field": "pauseButton",
+          "script": "PuzzleDirector",
+          "value": "HUD/Controles/Pausa"
+        },
+        {
+          "field": "stepButton",
+          "script": "PuzzleDirector",
+          "value": "HUD/Controles/Paso"
+        },
+        {
+          "field": "resetButton",
+          "script": "PuzzleDirector",
+          "value": "HUD/Controles/Reiniciar"
+        },
+        {
+          "field": "sphereButton",
+          "script": "PuzzleDirector",
+          "value": "HUD/Herramientas/Esfera"
+        },
+        {
+          "field": "cubeButton",
+          "script": "PuzzleDirector",
+          "value": "HUD/Herramientas/Cubo"
+        },
+        {
+          "field": "rotateButton",
+          "script": "PuzzleDirector",
+          "value": "HUD/Herramientas/Rotar"
+        },
+        {
+          "field": "removeButton",
+          "script": "PuzzleDirector",
+          "value": "HUD/Herramientas/Quitar"
+        },
+        {
+          "field": "startPlane",
+          "script": "SurfaceLight",
+          "value": "Nivel/PlanoSalida"
+        },
+        {
+          "field": "endPlane",
+          "script": "SurfaceLight",
+          "value": "Nivel/PlanoLlegada"
+        },
+        {
+          "field": "figures",
+          "script": "SurfaceLight",
+          "value": "Nivel/Figuras"
+        },
+        {
+          "field": "hud",
+          "script": "PuzzleDirector",
+          "value": "HUD"
+        },
+        {
+          "field": "level",
+          "script": "LevelTransition",
+          "value": "Nivel"
+        },
+        {
+          "field": "camera",
+          "script": "LevelTransition",
+          "value": "Camara"
+        },
+        {
+          "field": "pivot",
+          "script": "LevelTransition",
+          "value": "Pivote"
+        }
+      ],
+      "scripts": [
+        "PuzzleDirector",
+        "SurfaceLight",
+        "LevelTransition",
+        "GameHud"
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [
+        {
+          "active": true,
+          "castShadows": false,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets/Materials/Sheet.strmat",
+          "name": "D_Portada",
+          "position": [
+            0.0,
+            0.0,
+            2.5
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            90.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            2.527777910232544,
+            1.0,
+            2.527777910232544
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "castShadows": false,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets/Materials/Sheet.strmat",
+          "name": "D_Piso",
+          "position": [
+            0.0,
+            -5.0,
+            2.5
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            90.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            2.527777910232544,
+            1.0,
+            2.527777910232544
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "castShadows": false,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets/Materials/Sheet.strmat",
+          "name": "D_Izquierda",
+          "position": [
+            -5.0,
+            0.0,
+            2.5
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            90.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            2.527777910232544,
+            1.0,
+            2.527777910232544
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "castShadows": false,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets/Materials/Sheet.strmat",
+          "name": "D_Derecha",
+          "position": [
+            5.0,
+            0.0,
+            2.5
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            90.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            2.527777910232544,
+            1.0,
+            2.527777910232544
+          ],
+          "staticForLighting": false
+        },
+        {
+          "active": true,
+          "castShadows": false,
+          "children": [],
+          "faceCulling": false,
+          "material": "Assets/Materials/Sheet.strmat",
+          "name": "D_Techo",
+          "position": [
+            0.0,
+            5.0,
+            2.5
+          ],
+          "primitive": "Plane",
+          "rotation": [
+            90.0,
+            -0.0,
+            0.0
+          ],
+          "scale": [
+            2.527777910232544,
+            1.0,
+            2.527777910232544
+          ],
+          "staticForLighting": false
+        }
+      ],
+      "faceCulling": true,
+      "name": "Menu",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scriptFields": [
+        {
+          "field": "camera",
+          "script": "MainMenu",
+          "value": "Camara"
+        }
+      ],
+      "scripts": [
+        "MainMenu"
+      ],
+      "staticForLighting": false
+    },
+    {
+      "active": true,
+      "children": [],
+      "components": [
+        {
+          "baseHeight": 720,
+          "baseWidth": 320,
+          "bloom": true,
+          "bloomIntensity": 0.8500000238418579,
+          "bloomRadius": 1.350000023841858,
+          "bloomThreshold": 0.6000000238418579,
+          "fillWidth": true,
+          "pixelate": false,
+          "type": "SubViewport"
+        }
+      ],
+      "faceCulling": true,
+      "name": "Postproceso",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primitive": "Empty",
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "staticForLighting": false
+    }
+  ]
+}

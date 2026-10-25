@@ -1,0 +1,27 @@
+; NIVEL 21 - LA ESPIRAL (24/10/2026, hecho a mano)
+;
+; Cuatro estantes alrededor de una columna vacia, cada uno un escalon mas alto y
+; en otro cuadrante: una escalera de caracol de dimensiones. En cada esquina la
+; luz necesita una CUNA para subir al estante siguiente y una PIRAMIDE para
+; girar hacia el - y a veces la piramide le entrega la luz directo a la cuna.
+title THE SPIRAL
+hint CLIMB AND TURN, CLIMB AND TURN
+rules 3
+size 7 8 7
+start floor 0 0 0 2 0 2
+source 0 0 1 right
+panel floor 3 1 0 6 1 2
+panel floor 4 2 3 6 2 6
+panel floor 0 3 4 3 3 6
+end front 0 3 4 3 6 4
+receiver 1 6 4
+inventory prism 3 pyramid 3 sphere 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place prism 2 0 1 down right
+;! place pyramid 5 1 1 up
+;! place prism 5 1 2 down back
+;! place pyramid 5 2 5 up
+;! place prism 4 2 5 down left
+;! place pyramid 1 3 5 up

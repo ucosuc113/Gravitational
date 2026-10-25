@@ -1,0 +1,69 @@
+{
+  "android": {
+    "arm64": true,
+    "immersive": true,
+    "keepScreenOn": true,
+    "minSdk": 26,
+    "orientation": "sensorLandscape",
+    "outputDir": "Build/Android",
+    "packageName": "",
+    "targetSdk": 0,
+    "versionCode": 1,
+    "x86_64": true
+  },
+  "build": {
+    "cleanFirst": false,
+    "development": false,
+    "excludeExtensions": ".cpp .h .hpp .inl .fbx .glb .gltf .blend .psd .ini",
+    "excludeFolders": [
+      "Assets/Scripts"
+    ],
+    "openFolder": true,
+    "outputDir": "Build/Windows",
+    "stopOnProblems": false,
+    "zip": false
+  },
+  "input": {
+    "cursor": "visible"
+  },
+  "platform": "windows",
+  "product": {
+    "company": "",
+    "copyright": "",
+    "icon": "",
+    "name": "Gravitational",
+    "version": "1.0.0"
+  },
+  "render": {
+    "aa": "x2",
+    "lighting": "soft",
+    "shadowAA": "x2",
+    "shadows": "medium"
+  },
+  "scenes": [
+    {
+      "enabled": true,
+      "name": "Escena Principal",
+      "path": "Scenes/Escena Principal.strscene"
+    }
+  ],
+  "web": {
+    "embedHeight": 720,
+    "embedWidth": 1280,
+    "fullscreenButton": true,
+    "language": "en",
+    "outputDir": "Build/Web",
+    "runInBackground": true,
+    "startPrompt": "",
+    "zip": true
+  },
+  "window": {
+    "fullscreenToggle": true,
+    "height": 720,
+    "mode": "windowed",
+    "resizable": true,
+    "runInBackground": true,
+    "vsync": true,
+    "width": 1280
+  }
+}

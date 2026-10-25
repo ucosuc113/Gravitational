@@ -1,0 +1,26 @@
+; NIVEL 18 - LA TORRE (24/10/2026, hecho a mano)
+;
+; Planos apilados alrededor de una columna vacia, cada uno mirando hacia otro
+; lado: la luz sube sola el primer tramo y se queda en un estante. Una ESFERA la
+; pasa a la pared de atras; sobre esa pared vertical, un TOROIDE se la pasa a un
+; CUBO, y la franja del cubo la dobla arriba hacia la llegada. Una cadena de
+; piezas sobre un plano parado.
+title THE TOWER
+hint PIECES CAN ALSO PASS THE LIGHT TO EACH OTHER
+rules 3
+size 7 10 7
+start floor 0 0 2 2 0 4
+source 0 0 3 right
+panel right 2 0 2 2 3 4
+panel floor 3 4 1 5 4 3
+panel back 3 4 3 5 7 3
+panel floor 1 8 3 5 8 6
+end left 1 8 3 1 9 6
+receiver 1 9 3
+inventory pyramid 2 sphere 1 cube 1 prism 1 torus 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place sphere 3 4 3
+;! place torus 3 6 3 x
+;! place cube 3 7 3 z

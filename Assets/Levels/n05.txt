@@ -1,0 +1,25 @@
+; NIVEL 05 - LA FRANJA GIRA
+;
+; Generado con Tools/LevelLab (levellab gen skel/s05.txt) y elegido con pick.py
+; (candidato 1: 5 piezas, 7 tramos de luz). Ver docs/niveles.md.
+title THE BAND SPINS
+hint THE CUBE TURNS LIGHT THAT TRAVELS ALONG ITS AXIS: WATCH WHERE ITS ARROWS SPIN
+rules 3
+start left
+end right
+size 4 4 4
+source 0 0 1 up
+receiver 3 1 0
+fixed blackhole 1 1 1
+inventory sphere 1 cube 4
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+; (rehecha el 24/10/2026 para las reglas 2: desde el plano un cubo apoyado ya no
+; dobla la luz; aca la dobla el ultimo, que la recibe del cubo de al lado yendo
+; por su eje. La busco levellab solve: las mismas 5 piezas, minima)
+;! minimal
+;! place sphere 0 1 1
+;! place cube 0 1 2 y
+;! place cube 1 1 2 z
+;! place cube 2 1 2 z
+;! place cube 3 1 2 -y

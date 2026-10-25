@@ -1,0 +1,21 @@
+; NIVEL 09 - LA CINTA: la torsion (24/10/2026, hecho a mano)
+;
+; Una franja baja y, a su costado, una cerca vertical que flota y sigue mas
+; alla de donde la franja se acaba. La esfera tambien le pasa la luz a la cerca,
+; pero DOBLANDOLA: la luz sube por la cerca y se pierde arriba. La torsion se la
+; pasa sin doblarla: la luz sigue hacia adelante, ahora por la cerca, hasta el
+; plano de llegada. Lo que se aprende es la diferencia entre las dos.
+title THE RIBBON
+hint THE SPHERE TURNS LIGHT. THE TWIST MOVES IT TO ANOTHER PLANE AND LETS IT GO ON
+rules 3
+size 9 5 4
+start floor 0 0 0 4 0 1
+source 0 0 1 right
+panel back 4 0 1 8 2 1
+end right 8 0 0 8 4 3
+receiver 8 0 0
+inventory twist 1 sphere 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place twist 2 0 1 right up

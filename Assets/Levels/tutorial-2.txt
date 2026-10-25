@@ -1,0 +1,19 @@
+title FLOOR AND CEILING
+rules 3
+; NIVEL 3 - del piso al techo, con un cubo (lo hizo la IA como prueba).
+;
+; El puente sube en vertical, y la pieza del medio es un cubo: su franja tiene
+; que quedar en el eje por donde la luz da la vuelta.
+; Solucion: esfera en (1 0 1), cubo en (1 1 1) rotado una vez (eje z), esfera
+; en (1 2 1).
+start floor
+end ceiling
+size 3 3 3
+source 2 0 1 left
+receiver 2 2 1
+inventory sphere 2 cube 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! place sphere 1 0 1
+;! place cube 1 1 1 z
+;! place sphere 1 2 1

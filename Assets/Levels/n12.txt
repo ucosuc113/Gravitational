@@ -1,0 +1,23 @@
+; NIVEL 12 - EL POZO: el gusano (24/10/2026, hecho a mano)
+;
+; Los planos de portal (cian) tambien flotan. La luz trepa por uno vertical que
+; se levanta al final de la franja, y arriba se pierde. Lejos y alto flota otro,
+; horizontal, que lleva a la llegada. Un pozo en el primero hace caer la luz por
+; la garganta y la saca por el otro pozo, sobre el otro plano, "hacia el mismo
+; lado". El receptor esta en la fila del fondo: el pozo de salida va donde la
+; luz tiene que salir.
+title THE PIT
+hint WHAT FALLS INTO ONE PIT COMES OUT OF THE OTHER, IN ANOTHER DIMENSION
+rules 3
+size 8 6 4
+start floor 0 0 0 2 0 3
+source 0 0 1 right
+portal right 2 0 0 2 3 3
+portal floor 5 4 0 7 4 3
+end right 7 4 0 7 5 3
+receiver 7 5 3
+inventory wormhole 1 sphere 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place wormhole 2 0 1 5 4 3

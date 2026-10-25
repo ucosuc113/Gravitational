@@ -1,0 +1,21 @@
+; NIVEL 10 - A LA IZQUIERDA: la curva (24/10/2026, hecho a mano)
+;
+; La franja choca con una pared que flota, ancha. Sin piezas la luz sube por
+; ella (la arista concava) y se pierde arriba. La curva tambien la sube a la
+; pared, pero DOBLANDO a la izquierda: la luz corre a lo largo de la pared, a ras
+; del piso, hasta el plano de llegada que se levanta en su borde del fondo, y
+; dobla otra vez en la esquina.
+title TO THE LEFT
+hint A WALL ALONE LIFTS LIGHT STRAIGHT UP. THE CURVE LIFTS IT WHILE TURNING
+rules 3
+size 6 5 6
+start floor 0 0 0 3 0 1
+source 0 0 0 right
+panel right 3 0 0 3 2 5
+end back 0 0 5 3 3 5
+receiver 0 0 5
+inventory bend 1 sphere 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place bend 3 0 0 right up

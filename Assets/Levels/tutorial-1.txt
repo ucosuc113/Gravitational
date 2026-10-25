@@ -1,0 +1,21 @@
+title SPHERE BRIDGE
+hint LIGHT CROSSES FROM ONE SURFACE TO ANOTHER WHERE THEY TOUCH
+rules 3
+; NIVEL 1 - TUTORIAL: tres esferas (lo hizo la IA; los niveles de verdad los
+; disena la persona). Ver docs/reglas.md.
+;
+; La luz sale hacia arriba por la pared izquierda. Para llegar al receptor, en
+; la pared derecha, hay que tenderle un puente de esferas que se toquen entre
+; si y con las dos paredes.
+; Solucion: esferas en (0 2 1), (1 2 1) y (2 2 1).
+start left
+end right
+size 3 3 3
+source 0 1 1 up
+receiver 2 2 1
+inventory sphere 3 cube 0
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! place sphere 0 2 1
+;! place sphere 1 2 1
+;! place sphere 2 2 1

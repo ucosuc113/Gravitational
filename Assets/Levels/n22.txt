@@ -1,0 +1,29 @@
+; NIVEL 22 - GRAVEDAD (24/10/2026, hecho a mano)
+;
+; Dos islas lejanas, cada una con un plano de portal (cian). En la primera el
+; portal flota de costado, paralelo a la luz: una PIRAMIDE la lleva hasta el. En
+; la segunda, alta, una cerca de agujeros negros guarda la llegada: el pozo de
+; salida del GUSANO tiene que ir detras de la cerca, y en la llegada otra
+; PIRAMIDE corre la luz hasta la columna del receptor.
+title GRAVITY
+hint THE WORMHOLE CHOOSES WHERE TO COME OUT. THE HOLES, WHERE NOT
+rules 3
+size 10 8 5
+start floor 0 0 0 2 0 3
+source 0 0 1 right
+portal back 0 0 3 2 3 3
+portal floor 5 5 0 8 5 4
+panel floor 9 5 0 9 5 4
+fixed blackhole 5 5 3
+fixed blackhole 6 5 3
+fixed blackhole 7 5 3
+fixed blackhole 8 5 3
+end back 5 5 4 9 7 4
+receiver 9 7 4
+inventory pyramid 2 wormhole 1 sphere 1 cube 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place pyramid 1 0 1 up
+;! place wormhole 1 0 3 5 5 4
+;! place pyramid 5 7 4 back

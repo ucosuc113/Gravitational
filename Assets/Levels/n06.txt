@@ -1,0 +1,31 @@
+; NIVEL 06 - EL PLIEGUE: la piramide, y el primer nivel de planos flotantes (24/10/2026), hecho a mano.
+;
+; Ninguno de los planos es una pared ni un piso: son dimensiones que flotan, y
+; la luz pasa de una a otra por sus bordes. La idea, en tres tiempos:
+;   1. la luz nace en una franja baja y se pierde en su borde; al costado flota
+;      una pared, y una ESFERA en la franja le pasa la luz de costado;
+;   2. la pared la sube sola, y por su borde de arriba la luz da la vuelta y
+;      cae en un estante que flota del otro lado (sin piezas: los planos se
+;      pliegan);
+;   3. en el estante la luz va hacia el fondo y se pierde; una PIRAMIDE la
+;      dobla, y por el borde del estante sube al plano de llegada.
+title THE FOLD
+hint EACH PLANE IS A DIMENSION. LIGHT CROSSES FROM ONE TO ANOTHER AT THEIR EDGES
+rules 3
+size 8 6 5
+; la salida: una franja baja
+start floor 0 0 0 3 0 1
+source 0 0 1 right
+; una pared que flota al costado de la franja (su lado de la luz mira a -Z)
+panel back 2 0 1 5 3 1
+; el estante: sobre la pared, del otro lado, y hasta el borde de la caja
+panel floor 0 4 2 5 4 4
+; la llegada: se levanta en el borde del estante
+end left 0 4 0 0 5 4
+receiver 0 5 3
+inventory sphere 1 pyramid 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place sphere 3 0 1
+;! place pyramid 3 4 3 up

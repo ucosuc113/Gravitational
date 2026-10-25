@@ -1,0 +1,24 @@
+; NIVEL 16 - TRES ALTURAS (24/10/2026, hecho a mano)
+;
+; Tres planos horizontales a tres alturas, cada uno corrido hacia otro lado. La
+; luz sube del primero al segundo por una RAMPA (a una pared suspendida, y por
+; encima), en el segundo una PIRAMIDE la dobla hacia el fondo, y una CUNA la sube
+; al tercero, desde donde trepa por la llegada. Una pieza distinta por altura.
+title THREE HEIGHTS
+hint EACH HEIGHT IS REACHED A DIFFERENT WAY
+rules 3
+size 8 7 8
+start floor 0 0 0 3 0 2
+source 0 0 1 right
+panel right 3 1 0 3 2 3
+panel floor 4 3 0 6 3 3
+panel floor 4 4 4 6 4 7
+end back 3 4 7 7 6 7
+receiver 5 6 7
+inventory ramp 1 pyramid 1 prism 1 sphere 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place ramp 2 0 1 right up
+;! place pyramid 5 3 1 up
+;! place prism 5 3 3 down back

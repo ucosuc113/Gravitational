@@ -1,0 +1,22 @@
+; NIVEL 04 - ESFERA GRANDE
+;
+; Generado con Tools/LevelLab (levellab gen skel/s04.txt) y elegido con pick.py
+; (candidato 4: 5 piezas, 7 tramos de luz). Ver docs/niveles.md.
+title BIG SPHERE
+hint A SIZE 3 SPHERE ONLY TOUCHES AT THE CENTER OF ITS FACES
+rules 3
+start floor
+end ceiling
+size 5 5 4
+source 0 0 1 right
+receiver 4 4 2
+fixed blackhole 4 3 2
+inventory sphere 4 sphere3 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place sphere3 3 1 1
+;! place sphere 3 3 1
+;! place sphere 3 3 2
+;! place sphere 2 3 2
+;! place sphere 2 4 2

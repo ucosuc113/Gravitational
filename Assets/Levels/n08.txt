@@ -1,0 +1,24 @@
+; NIVEL 08 - LA OLA: la rampa (24/10/2026, hecho a mano)
+;
+; Una franja baja, y una pared que flota SIN tocarla: la luz del piso no puede
+; subir a ella (no hay arista). La rampa si: levanta la luz del piso a la
+; pared. Arriba la pared se pliega en un estante alto, y del borde lejano del
+; estante cuelga la llegada: la luz sube, cruza y baja, como una ola. El
+; receptor queda al costado de donde baja: una piramide apoyada en la llegada
+; (un plano vertical) la dobla.
+title THE WAVE
+hint THE RAMP LIFTS LIGHT FROM THE FLOOR TO A WALL THAT DOES NOT TOUCH IT
+rules 3
+size 9 7 4
+start floor 0 0 0 3 0 3
+source 0 0 1 right
+panel right 3 1 0 3 4 3
+panel floor 4 5 0 7 5 3
+end left 8 1 0 8 4 3
+receiver 8 1 3
+inventory ramp 1 pyramid 1 sphere 1
+;
+; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
+;! minimal
+;! place ramp 2 0 1 right up
+;! place pyramid 8 1 1 right
