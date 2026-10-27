@@ -1,5 +1,6 @@
 #include "../Flow/GameFlow.h"
 #include "../Flow/MenuKit.h"
+#include "../Pieces/PlayTouch.h"
 
 #include "Engine/Diagnostics/Log.h"
 #include "Engine/Scene/GameObject.h"
@@ -18,6 +19,9 @@
 
 using namespace strace;
 using gravitational::Flow;
+using gravitational::PlayTouch;
+using gravitational::TouchGesture;
+using gravitational::TouchMode;
 
 class OrbitCamera : public IScript {
 public:
@@ -102,12 +106,33 @@ public:
             m_dragging = false;
             m_yaw = m_fixedView[0], m_pitch = m_fixedView[1], m_distance = m_fixedView[2];
         }
-        if (!flow.InGame()) return;
+        // El dedo se sigue tambien fuera de la partida, para que un toque que
+        // empezo en el menu no llegue al juego como uno nuevo.
+        const bool touch = TouchMode();
+        const TouchGesture* finger = touch ? &PlayTouch() : nullptr;
+        if (!flow.InGame()) {
+            flow.touchZoom = 0.0f;
+            return;
+        }
         const float sens = sensitivity.Get() * (flow.hasMenu ? flow.Sensitivity() : 1.0f);
         const float pitchSign = flow.settings.invertOrbit ? -1.0f : 1.0f;
 
         if (in.Pressed("orbitar") && !SceneUi::PointerOverUi()) m_dragging = true;
         if (!in.Held("orbitar")) m_dragging = false;
+
+        // Con el dedo: arrastrar sobre el mundo es orbitar (un toque sin
+        // arrastre es de FigureBuilder). Los grados por pixel se escalan al
+        // alto de la pantalla: con la sensibilidad de PC, que es por pixel de
+        // raton, un telefono de 1080 filas giraria el doble que el mismo gesto
+        // en uno de 540. Asi recorrer la pantalla de arriba abajo es media
+        // vuelta en cualquiera, lo mismo que con el raton a 720p.
+        if (finger && finger->down && finger->dragging && !finger->startedOnUi && !flow.passage.Active()) {
+            const float k = sens * 720.0f / std::max(1.0f, UiService::Height());
+            const float upright = std::cos(m_pitch * 3.141592f / 180.0f) >= 0.0f ? 1.0f : -1.0f;
+            m_yaw += finger->dx * k * upright;
+            m_pitch += finger->dy * k * pitchSign;
+            m_pitch = std::remainder(m_pitch, 360.0f);
+        }
 
         // cosa del click derecho orbitar alrededor de punto central XD
         // Sin limite vertical (pedido el 22/10/2026): la orbita da la vuelta
@@ -128,6 +153,14 @@ public:
         if (in.Held("zoom_acercar")) zoomSteps -= 8.0f * deltaTime; // ocho muescas por segundo
         if (in.Held("zoom_alejar")) zoomSteps += 8.0f * deltaTime;
         if (in.Held("zoom_arrastrar")) zoomSteps += in.CursorDeltaY() * 0.05f;
+        zoomSteps += flow.touchZoom; // los botones + y - del HUD (telefono)
+        flow.touchZoom = 0.0f;
+        // El pellizco: la distancia de la camara cambia en la proporcion
+        // INVERSA a la de los dedos (separarlos al doble deja la camara a la
+        // mitad: lo que se mira crece con los dedos, como en una foto). Pasado
+        // a muescas para que entre por el mismo camino y los mismos limites.
+        if (finger && finger->pinching && finger->pinch > 0.0f && finger->pinch != 1.0f)
+            zoomSteps -= std::log(finger->pinch) / std::log(1.0f + std::max(0.01f, zoomSpeed.Get()));
         m_distance *= std::pow(1.0f + zoomSpeed.Get(), zoomSteps);
         m_distance = std::clamp(m_distance, minDistance.Get(), maxDistance.Get());
         if (m_fixed) m_distance = m_fixedView[2];

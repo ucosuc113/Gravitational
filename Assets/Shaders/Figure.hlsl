@@ -147,7 +147,11 @@ float FigCubeArc(float angle) {
 }
 
 float4 PSMain(PSInput input) : SV_TARGET {
-    if (EmissiveSelected.a > 0.5f) return float4(StraceSelectionTint(input), 1.0f);
+    // Sin return temprano para la seleccion, y UNA sola salida: en GLES el
+    // traductor convierte cada return temprano en un do{...}while(false) que
+    // envuelve el cuerpo, y con un cuerpo grande el compilador de ANGLE/D3D11
+    // de Chrome se cae (0xC0000005, se lleva el proceso de GPU entero). El
+    // tinte va al final (ver Piece.hlsl para la nota completa).
 
     // La superficie es NEGRO TOTAL, sin luz: como los planos en modo "solo
     // lineas", donde lo que no es cuadricula es el vacio. La forma la dan las
@@ -258,5 +262,7 @@ float4 PSMain(PSInput input) : SV_TARGET {
     float boost = SolvedBoost(UserParams[0].y);
     lit += (beam + glow) * boost;
 
-    return float4(lit, AlbedoColor.a);
+    float4 result = float4(lit, AlbedoColor.a);
+    if (EmissiveSelected.a > 0.5f) result = float4(StraceSelectionTint(input), 1.0f);
+    return result;
 }

@@ -121,7 +121,12 @@ static const float3 kPortalEdge = float3(0.80f, 0.97f, 1.00f);
 float Ring(float r, float radius, float hw, float px) { return saturate((hw + 0.5f * px - abs(r - radius)) / px); }
 
 float4 PSMain(PSInput input) : SV_TARGET {
-    if (EmissiveSelected.a > 0.5f) return float4(StraceSelectionTint(input), 1.0f);
+    // Sin return temprano para la seleccion, y UNA sola salida: en GLES el
+    // traductor convierte cada return temprano en un do{...}while(false) que
+    // envuelve el cuerpo, y con un cuerpo grande el compilador de ANGLE/D3D11
+    // de Chrome se cae (0xC0000005, se lleva el proceso de GPU entero). El
+    // tinte y los tres modos van en una cadena de if/else al final (ver
+    // Piece.hlsl para la nota completa).
 
     float3 P = input.worldPos;
     float px = GravPixel(P);
@@ -199,28 +204,33 @@ float4 PSMain(PSInput input) : SV_TARGET {
     float boost = SolvedBoost(UserParams[2].y);
     float3 light = (max(beam, kBeamHot * saturate(mark)) + glow + kBeamHalo * markHalo) * boost;
 
-    // CAPA DE LUZ (UserParams[0].z = 3, SurfaceBeam.strmat, ADITIVA): un hijo
-    // del plano con la misma malla que trae los tramos 3 en adelante
-    // (SurfaceLight). Solo la luz: la cuadricula y la marca ya las dibujo el
-    // plano debajo, y sumarlas otra vez las doblaria. Lo que no es luz se
-    // descarta para no pagar la mezcla en todo el plano.
-    if (UserParams[0].z > 2.5f) {
+    // Los tres modos y la seleccion, en UNA cadena sin retornos hasta el final
+    // (ver el comentario de PSMain). Elegida = tinte plano y sin recortar,
+    // igual que cuando el tinte se comprobaba al principio.
+    float4 result;
+    if (EmissiveSelected.a > 0.5f) {
+        result = float4(StraceSelectionTint(input), 1.0f);
+    } else if (UserParams[0].z > 2.5f) {
+        // CAPA DE LUZ (UserParams[0].z = 3, SurfaceBeam.strmat, ADITIVA): un hijo
+        // del plano con la misma malla que trae los tramos 3 en adelante
+        // (SurfaceLight). Solo la luz: la cuadricula y la marca ya las dibujo el
+        // plano debajo, y sumarlas otra vez las doblaria. Lo que no es luz se
+        // descarta para no pagar la mezcla en todo el plano.
         clip(max(core, halo * 1.5f) - 0.02f);
-        return float4((beam + glow) * boost, 1.0f);
-    }
-
-    // Modo "solo lineas" (los planos del juego): se descarta lo que no es
-    // cuadricula, luz ni marca, y queda todo flotando en el vacio. Los dos
-    // planos se miran entre si: opacos, el de adelante tapaba la luz del otro.
-    if (UserParams[0].z > 0.5f) {
+        result = float4((beam + glow) * boost, 1.0f);
+    } else if (UserParams[0].z > 0.5f) {
+        // Modo "solo lineas" (los planos del juego): se descarta lo que no es
+        // cuadricula, luz ni marca, y queda todo flotando en el vacio. Los dos
+        // planos se miran entre si: opacos, el de adelante tapaba la luz del otro.
         clip(max(max(wg.x, wg.y * 0.6f), max(edge, max(core, max(mark, halo * 1.5f)))) - 0.08f);
-        return float4(lineColor * grid + light, 1.0f);
+        result = float4(lineColor * grid + light, 1.0f);
+    } else {
+        // La superficie se ilumina; la cuadricula NO: es el dibujo de la geometria,
+        // no un color de la superficie.
+        float3 albedo = AlbedoColor.rgb * AlbedoTex.Sample(AlbedoSampler, input.uv).rgb;
+        float3 lit = StraceLighting(albedo, input);
+        lit = lerp(lit, lineColor, saturate(grid * 2.0f));
+        result = float4(lit + light, AlbedoColor.a);
     }
-
-    // La superficie se ilumina; la cuadricula NO: es el dibujo de la geometria,
-    // no un color de la superficie.
-    float3 albedo = AlbedoColor.rgb * AlbedoTex.Sample(AlbedoSampler, input.uv).rgb;
-    float3 lit = StraceLighting(albedo, input);
-    lit = lerp(lit, lineColor, saturate(grid * 2.0f));
-    return float4(lit + light, AlbedoColor.a);
+    return result;
 }

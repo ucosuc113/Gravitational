@@ -156,7 +156,15 @@ float PrismSigma(float2 q) {
 }
 
 float4 PSMain(PSInput input) : SV_TARGET {
-    if (EmissiveSelected.a > 0.5f) return float4(StraceSelectionTint(input), 1.0f);
+    // UNA SOLA SALIDA, con la seleccion al FINAL y sin return temprano. En GLES
+    // el traductor convierte cada return temprano en un do{...}while(false)
+    // que envuelve el cuerpo entero, y con este shader - el mas grande del
+    // juego - el compilador de ANGLE/D3D11 de Chrome se CAE con 0xC0000005: se
+    // lleva el proceso de GPU, y con el el contexto WebGL; despues cada destino
+    // del motor sale "incompleto (36061)" y la pagina queda negra (docs/web.md,
+    // "Un shader puede tirar el proceso de GPU"). Es la misma regla que ya
+    // sigue el integrado. El precio: con la pieza elegida en el Editor se
+    // calcula el cuerpo entero para al final taparlo con el tinte.
 
     int shape = (int)(UserParams[2].w + 0.5f);
     float3 U = UserParams[1].xyz, F = UserParams[2].xyz, S = cross(F, U);
@@ -479,6 +487,11 @@ float4 PSMain(PSInput input) : SV_TARGET {
     float boost = SolvedBoost(UserParams[0].y);
     lit += (beam + glow) * boost;
     lit += (kBeamHot * swirl * 0.9f + kBeamHalo * swirl * 0.4f) * boost;
-    if (hole) clip(max(holeCover, max(swirl * 1.5f, max(core, halo * 1.5f))) - 0.06f);
-    return float4(lit, AlbedoColor.a);
+    // La seleccion y el recorte SIN return temprano (ver el comentario de
+    // PSMain): elegida = tinte plano y sin recortar, como cuando el tinte iba
+    // primero; sin elegir, el recorte de siempre.
+    float4 result = float4(lit, AlbedoColor.a);
+    if (EmissiveSelected.a > 0.5f) result = float4(StraceSelectionTint(input), 1.0f);
+    else if (hole) clip(max(holeCover, max(swirl * 1.5f, max(core, halo * 1.5f))) - 0.06f);
+    return result;
 }

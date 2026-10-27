@@ -29,11 +29,21 @@
 // Todo tiene tecla, y la tecla esta escrita en el boton:
 //   1..9 las piezas, R rotar, X quitar, Z deshacer, ESPACIO pausa, F paso,
 //   F5 reiniciar, ESC menu.
+//
+// EN UN TELEFONO (Flow/Touch.h) no hay teclas ni rueda, y un dedo es mas gordo
+// que un cursor. Cambian cuatro cosas, todas desde aca y sin tocar la escena:
+//   - el canvas se dibuja mas grande (referencia de ~500 filas en vez de 720),
+//     hasta donde la barra entre a lo ancho;
+//   - las teclas escritas en los botones y en las casillas se esconden;
+//   - "ESC  MENU" pasa a ser un boton MENU, y aparecen + y - para el zoom;
+//   - los textos dicen TAP y no CLICK.
 
 #include "../Audio/GameAudio.h"
 #include "../Puzzle/PuzzleSession.h"
 #include "../Flow/GameFlow.h"
 #include "../Flow/MenuKit.h"
+#include "../Flow/Touch.h"
+#include "../Pieces/PlayTouch.h"
 
 #include "Engine/Diagnostics/Log.h"
 #include "Engine/Input/InputService.h"
@@ -169,7 +179,10 @@ constexpr float kSlot = 60.0f;   // una casilla de pieza (y la altura de los bot
 constexpr float kGap = 8.0f;     // entre casillas y entre botones
 constexpr float kSep = 22.0f;    // entre grupos (con un separador en el medio)
 constexpr float kPadX = 14.0f;   // margen de la barra a los costados
-constexpr float kRefHeight = 720.0f;
+// En un telefono: la altura de referencia del canvas. Menos filas = todo mas
+// grande; 500 deja las casillas de ~8 mm en un telefono comun, que es lo que
+// pide un dedo. Si con eso la barra no entra a lo ancho, se sube lo justo.
+constexpr float kTouchRefHeight = 500.0f;
 
 } // namespace
 
@@ -215,7 +228,7 @@ public:
         const float mx = in.CursorX(), my = in.CursorY();
         const bool click = visible && in.CursorInside() && in.Pressed("hud_click");
         const float W = UiService::Width(), H = UiService::Height();
-        const float u = H / kRefHeight; // la escala del canvas (SceneUi: alto / referencia)
+        const bool touch = TouchMode();
 
         // ---------- Arriba a la izquierda: el nivel ----------
         char head[32];
@@ -225,7 +238,7 @@ public:
         Text(m.stats, "MOVES " + std::to_string(s.moves) + "     " + Clock(s.elapsed));
         Text(m.hint, s.board.hint);
         Show(m.hint, !s.board.hint.empty());
-        Show(m.menu, flow.hasMenu);
+        Show(m.menu, flow.hasMenu && !TouchMode());
 
         // ---------- Arriba al centro: que hizo la luz ----------
         UpdateStatus(s, a);
@@ -238,6 +251,8 @@ public:
         for (int i = 0; i < kShapeCount; ++i)
             if (s.board.inventory[i] + placedByPlayer[i] > 0) shapes.push_back(static_cast<Shape>(i));
         Layout(shapes.size());
+        const float u = CanvasScale(touch, W, H); // la escala del canvas (SceneUi: alto / referencia)
+        for (GameObject* k : m.keys) Show(k, !touch);
 
         std::string describe;
         const UiRect bar = RectOf(m.bar, W, H);
@@ -291,8 +306,9 @@ public:
         PaintButton(m.step, m.stepText, false, a);
         PaintButton(m.reset, m.resetText, false, a);
 
-        if (Hovered(m.rotate)) describe = "ROTATE  -  CLICK ONE OF YOUR PIECES: IT MOVES TO ITS NEXT POSE";
-        if (Hovered(m.remove)) describe = "REMOVE  -  CLICK ONE OF YOUR PIECES: IT GOES BACK TO THE INVENTORY";
+        const std::string tap = TapWord();
+        if (Hovered(m.rotate)) describe = "ROTATE  -  " + tap + " ONE OF YOUR PIECES: IT MOVES TO ITS NEXT POSE";
+        if (Hovered(m.remove)) describe = "REMOVE  -  " + tap + " ONE OF YOUR PIECES: IT GOES BACK TO THE INVENTORY";
         if (Hovered(m.step)) describe = "STEP  -  PAUSE AND ADVANCE THE LIGHT ONE SURFACE";
 
         // La linea de arriba de la barra: lo que se esta por hacer, o lo que
@@ -303,10 +319,19 @@ public:
         }
         if (describe.empty()) {
             if (s.tool == Tool::Place) describe = std::string(Info(s.shape).label) + "  -  " + RuleOf(s.shape);
-            else if (s.tool == Tool::Rotate) describe = "ROTATE  -  CLICK ONE OF YOUR PIECES: IT MOVES TO ITS NEXT POSE";
-            else describe = "REMOVE  -  CLICK ONE OF YOUR PIECES: IT GOES BACK TO THE INVENTORY";
+            else if (s.tool == Tool::Rotate) describe = "ROTATE  -  " + tap + " ONE OF YOUR PIECES: IT MOVES TO ITS NEXT POSE";
+            else describe = "REMOVE  -  " + tap + " ONE OF YOUR PIECES: IT GOES BACK TO THE INVENTORY";
         }
         Text(m.describe, describe);
+        // Con el canvas agrandado del telefono, la descripcion de una pieza
+        // (hasta ~90 letras) puede pasarse del ancho: entonces baja un escalon
+        // antes que cortarse en los bordes.
+        if (UiLabel* l = LabelOf(m.describe)) {
+            const float room = W / u - 40.0f;
+            l->scale = touch && static_cast<float>(MeasureTextWidth(describe, 2)) > room ? 1 : 2;
+        }
+
+        if (touch) TouchButtons(s, flow, W, H, u, a, dt);
 
         // El aviso: arriba de la descripcion, en rojo, y se va solo. El ancho
         // es el del texto, asi que lo pone el puente.
@@ -340,6 +365,8 @@ private:
         GameObject *rotate = nullptr, *remove = nullptr, *undo = nullptr, *pause = nullptr, *step = nullptr, *reset = nullptr;
         GameObject *rotateText = nullptr, *removeText = nullptr, *undoText = nullptr, *pauseText = nullptr, *stepText = nullptr,
                    *resetText = nullptr;
+        GameObject* camHelp = nullptr;
+        std::vector<GameObject*> keys; // las "Tecla" de cada boton
     } m;
 
     bool Resolve() {
@@ -383,6 +410,10 @@ private:
         m.pauseText = find("HUD/Barra/Controles/Pausa/Texto");
         m.stepText = find("HUD/Barra/Controles/Paso/Texto");
         m.resetText = find("HUD/Barra/Controles/Reiniciar/Texto");
+        m.camHelp = find("HUD/Esquina/Camara");
+        for (const char* k : {"HUD/Barra/Herramientas/Rotar/Tecla", "HUD/Barra/Herramientas/Quitar/Tecla", "HUD/Barra/Controles/Deshacer/Tecla",
+                              "HUD/Barra/Controles/Pausa/Tecla", "HUD/Barra/Controles/Paso/Tecla", "HUD/Barra/Controles/Reiniciar/Tecla"})
+            if (GameObject* n = find(k)) m.keys.push_back(n);
         m_warned = true;
         m_base.clear();
         Snapshot(*m.root);
@@ -545,13 +576,89 @@ private:
             ui.AddRect(r, sel ? kit::Mix(kit::Black(a), kit::Beam(a), 0.12f) : kit::Black(0.0f));
             ui.AddRectOutline(r, sel ? kit::Beam(a) : hover ? kit::Dim(a) : kit::Faint(a), sel ? 2.0f : 1.0f);
             Icon(ui, sh, r.x + slot * 0.5f, r.y + slot * 0.42f, slot * 0.30f, sel ? kit::White(a * k) : kit::Dim(a * k), std::max(1.0f, std::floor(1.5f * u)));
-            if (i < 9) ui.AddText(r.x + 4.0f * u, r.y + 4.0f * u, std::to_string(i + 1), kit::Faint(a), xs);
+            if (i < 9 && !TouchMode()) ui.AddText(r.x + 4.0f * u, r.y + 4.0f * u, std::to_string(i + 1), kit::Faint(a), xs);
             const std::string count = "x" + std::to_string(left);
             ui.AddText(r.x + slot - kit::TextW(count, ss) - 4.0f * u, r.y + slot - kit::TextH(ss) - 4.0f * u, count,
                        left > 0 ? (sel ? kit::Beam(a) : kit::Dim(a)) : kit::Faint(a), ss);
             if (hover) describe = std::string(Info(sh).label) + "  -  " + RuleOf(sh);
             if (sel && sh == Shape::Wormhole && left % 2 == 1) describe = "WORMHOLE  -  PLACE THE OTHER PIT: ON A CYAN PLANE, WHERE THE LIGHT SHOULD EXIT";
         }
+    }
+
+    // La escala del canvas. En PC, la de la escena (720). En un telefono se
+    // ESCRIBE la referencia del canvas antes de que SceneUi lo dibuje: la
+    // escena guarda 720 y aca se baja a kTouchRefHeight, o a lo que haga
+    // falta para que la barra entre a lo ancho con un margen (cinco tipos de
+    // pieza en un telefono 16:9 no entran a 500). Llamarla despues de Layout:
+    // necesita el ancho de la barra.
+    float CanvasScale(bool touch, float W, float H) {
+        UiCanvas* c = m.root ? GetComponent<UiCanvas>(*m.root) : nullptr;
+        if (!c) return H / 720.0f;
+        if (touch) {
+            const UiTransform* bar = TransformOf(m.bar);
+            const float need = bar ? (bar->width + 48.0f) * H / std::max(1.0f, W) : 0.0f;
+            c->referenceHeight = std::max(kTouchRefHeight, std::ceil(need));
+        }
+        return c->referenceHeight > 0.0f ? H / c->referenceHeight : 1.0f;
+    }
+
+    // Lo que en PC son teclas y rueda: el boton MENU arriba a la derecha (en
+    // el lugar de "ESC  MENU") y + / - a la derecha, a media altura, donde
+    // cae el pulgar con el telefono acostado. Se dibujan con la UI inmediata,
+    // como las casillas, y sus rectangulos van a hudRects para que tocarlos no
+    // sea tambien tocar el mundo.
+    //
+    // Un boton responde al dedo que APOYO en el: un arrastre de la camara que
+    // pasa por encima del zoom no hace zoom.
+    void TouchButtons(PuzzleSession& s, GameFlow& flow, float W, float H, float u, float a, float dt) {
+        UiDrawList& ui = UiService::Frame();
+        const int ts = std::max(1, static_cast<int>(std::lround(2.0f * u)));
+        const float th = std::max(1.0f, std::floor(1.5f * u));
+
+        const UiRect menuR{std::floor(W - (28.0f + 132.0f) * u), std::floor(20.0f * u), std::floor(132.0f * u), std::floor(52.0f * u)};
+        const float zs = std::floor(68.0f * u);
+        const UiRect inR{std::floor(W - 28.0f * u - zs), std::floor(H * 0.5f - zs - 6.0f * u), zs, zs};
+        const UiRect outR{inR.x, std::floor(H * 0.5f + 6.0f * u), zs, zs};
+        if (flow.hasMenu) s.hudRects.push_back({menuR.x, menuR.y, menuR.width, menuR.height});
+        s.hudRects.push_back({inR.x, inR.y, inR.width, inR.height});
+        s.hudRects.push_back({outR.x, outR.y, outR.width, outR.height});
+
+        // Despues de publicar los rectangulos: si este script corre antes que
+        // la camara, el dedo se actualiza ya sabiendo que estos son interfaz.
+        const TouchGesture& g = PlayTouch();
+        const InputActions& in = InputService::Actions();
+        const float mx = in.CursorX(), my = in.CursorY();
+        auto pressing = [&](const UiRect& r) { return g.down && kit::Inside(r, g.startX, g.startY) && kit::Inside(r, mx, my); };
+        auto box = [&](const UiRect& r, bool on) {
+            ui.AddRect(r, on ? kit::Mix(kit::Black(a), kit::Beam(a), 0.18f) : kit::Black(0.55f * a));
+            ui.AddRectOutline(r, on ? kit::Beam(a) : kit::Faint(a), on ? 2.0f : 1.0f);
+        };
+
+        if (flow.hasMenu) {
+            const bool on = pressing(menuR);
+            box(menuR, on);
+            ui.AddTextCentered(menuR, "MENU", on ? kit::White(a) : kit::Dim(a), ts);
+            if (g.tap && kit::Inside(menuR, g.startX, g.startY) && kit::Inside(menuR, mx, my)) {
+                gameaudio::Play("Ui/ui_back");
+                flow.ReturnToMenu(MenuScreen::Main);
+            }
+        }
+        // La ayuda de la camara, debajo del boton (en PC va debajo de "ESC MENU").
+        Text(m.camHelp, "DRAG  TURN     TAP  PLACE");
+        if (UiTransform* t = TransformOf(m.camHelp)) t->y = 60.0f;
+
+        // + acerca y - aleja, a ocho muescas por segundo mientras se mantiene:
+        // lo mismo que las teclas Q y E.
+        const bool zin = pressing(inR), zout = pressing(outR);
+        if (zin) flow.touchZoom -= 8.0f * dt;
+        if (zout) flow.touchZoom += 8.0f * dt;
+        box(inR, zin);
+        box(outR, zout);
+        const float cx = inR.x + zs * 0.5f, arm = zs * 0.22f;
+        const UiColor ic = zin ? kit::White(a) : kit::Dim(a), oc = zout ? kit::White(a) : kit::Dim(a);
+        ui.AddLine(cx - arm, inR.y + zs * 0.5f, cx + arm, inR.y + zs * 0.5f, ic, th * 1.5f);
+        ui.AddLine(cx, inR.y + zs * 0.5f - arm, cx, inR.y + zs * 0.5f + arm, ic, th * 1.5f);
+        ui.AddLine(cx - arm, outR.y + zs * 0.5f, cx + arm, outR.y + zs * 0.5f, oc, th * 1.5f);
     }
 
     static const char* SlotAction(int i) {

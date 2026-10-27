@@ -21,12 +21,12 @@
     "openFolder": true,
     "outputDir": "Build/Windows",
     "stopOnProblems": false,
-    "zip": false
+    "zip": true
   },
   "input": {
     "cursor": "visible"
   },
-  "platform": "android",
+  "platform": "windows",
   "product": {
     "company": "",
     "copyright": "",

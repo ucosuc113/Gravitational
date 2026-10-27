@@ -20,6 +20,7 @@
 #include "PieceNode.h"
 #include "Picking.h"
 #include "PlaneNodes.h"
+#include "PlayTouch.h"
 
 #include "Engine/Input/InputService.h"
 #include "Engine/Rendering/Camera.h"
@@ -52,6 +53,15 @@ public:
         GameObject* g = ghost.Get();
         if (g) g->active = false;
         s.hoverFigure = -1;
+        // En un telefono el dedo es el cursor y el clic es un TOQUE (Flow/
+        // Touch.h): se actua al levantarlo sin haber arrastrado, porque
+        // arrastrar es girar la camara. Mientras esta apoyado y quieto, el
+        // fantasma muestra donde caeria la pieza: apoyar, mirar, soltar. Con el
+        // dedo arriba no hay cursor que seguir, asi que no hay fantasma.
+        const TouchGesture* finger = TouchMode() ? &PlayTouch() : nullptr;
+        const bool aiming = !finger || (finger->down && !finger->dragging && !finger->startedOnUi);
+        const bool act = finger ? finger->tap && !finger->startedOnUi : InputService::Actions().Pressed("construir");
+        if (!aiming && !act) return;
         // Con el menu delante el clic es del menu; durante el paso entre niveles, nada.
         if (!s.loaded || !Flow().InGame() || Flow().passage.Active()) return;
 
@@ -73,7 +83,7 @@ public:
 
         // El fantasma: la primera postura, o la pieza "como seria" en rojo si
         // no entra (para que se vea POR QUE no).
-        if (placing && pick.canPlace && g) {
+        if (placing && pick.canPlace && g && aiming) {
             Figure shown;
             const bool ok = !stances.empty();
             if (ok) shown = stances.front();
@@ -91,7 +101,7 @@ public:
             if (Material* m = SceneService::UniqueMaterial(*g)) m->userParams[0].x = ok && s.board.inventory[static_cast<int>(s.shape)] > 0 ? 0.0f : 1.0f;
         }
 
-        if (!in.Pressed("construir")) return;
+        if (!act) return;
         if (s.solved) return;
         const Board before = s.board;
         bool changed = false;

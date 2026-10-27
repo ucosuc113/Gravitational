@@ -91,6 +91,10 @@ struct GameFlow {
     // 3x3x3). Lo pone el director al cargar; OrbitCamera multiplica su
     // distancia por esto, asi el zoom de la persona se conserva entre niveles.
     float cameraScale = 1.0f;
+    // El zoom de los botones + y - del HUD en un telefono (no hay rueda ni
+    // teclas), en las mismas "muescas" que la rueda: positivo aleja. El HUD
+    // suma, OrbitCamera lo consume y lo vuelve a cero.
+    float touchZoom = 0.0f;
 
     // --- El paso entre niveles ---
     bool hasPassage = false;         // hay un LevelTransition en la escena

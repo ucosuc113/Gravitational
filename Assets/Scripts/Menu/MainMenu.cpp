@@ -24,12 +24,21 @@
 //
 // Las cinco caras son la misma lamina (Shaders/Sheet.hlsl) con otros ejes: el
 // pliegue es solo el angulo de cada eje alrededor de su arista.
+//
+// CON EL DEDO (Flow/Touch.h) el menu se maneja entero sin teclado: tocar elige
+// (al LEVANTAR el dedo, para que un barrido no elija la fila donde empezo),
+// BACK en la esquina hace lo de Esc, en NIVELES se barre a los lados (o se tocan
+// las flechas) para cambiar de pagina, en OPCIONES barrer sobre una fila cambia
+// su valor, y la pregunta de salir tiene sus dos botones. Todo eso se traduce a
+// la misma `Nav` que dan las teclas (TouchNav): el resto del menu no se entera
+// de con que se lo esta manejando.
 
 #include "../Audio/GameAudio.h"
 #include "../Flow/GameFlow.h"
 #include "../Flow/GameHost.h"
 #include "../Flow/MenuKit.h"
 #include "../Flow/MenuModel.h"
+#include "../Flow/Touch.h"
 
 #include "Engine/Diagnostics/Log.h"
 #include "Engine/Rendering/Material.h"
@@ -145,10 +154,15 @@ public:
             skipInput = true;
             BeginFromGame(flow.returnScreen);
         }
+        // El dedo se sigue tambien durante la partida: asi el toque que vuelve
+        // al menu (el boton MENU del HUD) no llega aca como uno nuevo.
+        m_touch.Update(false);
+        if (skipInput) m_touch.Cancel();
         gameObject->active = !flow.InGame();
         if (flow.InGame()) return;
 
         kit::Nav nav = kit::ReadNav();
+        if (TouchMode()) TouchNav(nav);
         const bool interactive = m_phase == Phase::Point || m_phase == Phase::Line || m_phase == Phase::Idle;
         if (skipInput || !interactive) nav = kit::Nav{};
         AutoDemo(nav);
@@ -717,6 +731,7 @@ private:
     }
 
     void BeginFromGame(MenuScreen screen) {
+        m_touch.Cancel();
         m_camFrom = CurrentCamera();
         m_face = screen == MenuScreen::Credits ? Ceiling : screen == MenuScreen::Levels ? Left : Back;
         m_row = 0;
@@ -766,13 +781,64 @@ private:
 
     int Hovered(const kit::Nav& nav) const {
         if (!nav.mouseInside) return -1;
+        return HitRow(nav.mx, nav.my);
+    }
+    // Un dedo no apunta como un cursor: con el, cada fila responde en un
+    // margen del 2,5% del alto alrededor de su texto (las filas estan a una
+    // celda de distancia, mas del doble, asi que no se pisan).
+    int HitRow(float x, float y) const {
+        const float pad = TouchMode() ? UiService::Height() * 0.025f : 6.0f;
         for (size_t i = 0; i < m_rects.size(); ++i)
-            if (kit::Inside(m_rects[i], nav.mx, nav.my, 6.0f)) return static_cast<int>(i);
+            if (kit::Inside(m_rects[i], x, y, pad)) return static_cast<int>(i);
         return -1;
+    }
+
+    // ------------------------------------------------------------------
+    // El dedo, traducido a la navegacion del teclado
+    // ------------------------------------------------------------------
+    //
+    // Los rectangulos son los que DrawText dejo el frame anterior (la camara
+    // apenas respira entre dos frames: no hace diferencia).
+    void TouchNav(kit::Nav& nav) {
+        const TouchGesture& g = m_touch;
+        // Ni el raton "pasa por encima" ni el apoyar es un clic: el clic es el
+        // toque, al levantar.
+        nav.mouseMoved = false;
+        nav.click = nav.mouseInside && g.tap;
+        auto tapped = [&](const UiRect& r) {
+            return g.tap && r.width > 0.0f && kit::Inside(r, g.startX, g.startY, 8.0f) && kit::Inside(r, nav.mx, nav.my, 8.0f);
+        };
+        if (m_phase == Phase::Point && m_quitAsk) {
+            if (tapped(m_quitRect)) nav.ok = true;
+            else if (g.tap) nav.back = true; // STAY, o tocar fuera: quedarse
+            nav.click = false;
+            return;
+        }
+        if (tapped(m_backRect)) {
+            nav.back = true;
+            nav.click = false;
+            return;
+        }
+        if (m_phase != Phase::Idle) return;
+        const bool pages = m_face == Left && Flow().levelCount > kRowsPerPage;
+        if (pages) {
+            // Barrer hacia la izquierda trae la pagina de la derecha, como al
+            // pasar las fotos de un telefono.
+            if (tapped(m_prevRect) || g.swipe == Swipe::Right) nav.left = true, nav.click = false;
+            if (tapped(m_nextRect) || g.swipe == Swipe::Left) nav.right = true, nav.click = false;
+        }
+        if (m_face == Right && (g.swipe == Swipe::Left || g.swipe == Swipe::Right)) {
+            // Sobre la fila donde empezo el barrido: esa es la que cambia.
+            const int row = HitRow(g.startX, g.startY);
+            if (row >= 0) m_row = row;
+            (g.swipe == Swipe::Right ? nav.right : nav.left) = true;
+        }
     }
 
     void DrawText(UiDrawList& ui) {
         m_rects.clear();
+        m_backRect = m_quitRect = m_prevRect = m_nextRect = UiRect{};
+        const bool touch = TouchMode();
         GameObject* cam = camera.Get();
         if (!cam || !cam->camera) return;
         const DirectX::XMMATRIX vp = kit::ViewProj(*cam);
@@ -786,10 +852,19 @@ private:
         if (m_phase == Phase::Point) {
             if (m_quitAsk) {
                 kit::TextCentered(ui, W * 0.5f, H * 0.70f, "QUIT THE GAME?", kit::White(), s);
-                kit::Hint(ui, "ENTER  QUIT     ESC  STAY");
+                if (touch) {
+                    // Los dos botones, lado a lado bajo la pregunta.
+                    const float bw = std::floor(H * 0.26f), bh = std::floor(H * 0.11f), gap = std::floor(H * 0.04f);
+                    m_quitRect = UiRect{std::floor(W * 0.5f - gap * 0.5f - bw), std::floor(H * 0.78f), bw, bh};
+                    const UiRect stay{std::floor(W * 0.5f + gap * 0.5f), m_quitRect.y, bw, bh};
+                    TouchButton(ui, m_quitRect, "QUIT", kit::Red(), ls);
+                    TouchButton(ui, stay, "STAY", kit::Beam(), ls);
+                } else {
+                    kit::Hint(ui, "ENTER  QUIT     ESC  STAY");
+                }
             } else {
                 const float a = kit::Saturate((m_phaseTime - 1.4f) / 1.0f) * (0.55f + 0.45f * std::sin(m_time * 2.0f));
-                kit::TextCentered(ui, W * 0.5f, H * 0.80f, "PRESS ANY KEY", kit::Faint(a), std::max(1, s - 1));
+                kit::TextCentered(ui, W * 0.5f, H * 0.80f, touch ? "TAP TO BEGIN" : "PRESS ANY KEY", kit::Faint(a), std::max(1, s - 1));
             }
             return;
         }
@@ -816,7 +891,7 @@ private:
             }
         }
         if (m_phase == Phase::Line) {
-            if (!m_autoRise && m_titleChars >= 13.0f) kit::Hint(ui, "ENTER  OPEN     ESC  ONE DIMENSION DOWN");
+            if (!m_autoRise && m_titleChars >= 13.0f) kit::Hint(ui, touch ? "TAP  OPEN" : "ENTER  OPEN     ESC  ONE DIMENSION DOWN");
             return;
         }
         if (m_phase != Phase::Idle) return;
@@ -824,6 +899,15 @@ private:
         // El resto, solo con la camara quieta: girando, un texto pegado a la
         // pantalla y no a la lamina se nota falso.
         const float a = kit::Saturate(m_arrive / 0.25f);
+        // BACK, lo que en PC es Esc. Arriba a la izquierda, como en cualquier
+        // aplicacion de telefono. (El boton de atras del sistema tambien sirve:
+        // el Player lo entrega como Escape.)
+        if (touch) {
+            const std::string back = "< BACK";
+            const float pad = std::floor(H * 0.025f);
+            m_backRect = UiRect{std::floor(H * 0.035f), std::floor(H * 0.035f), kit::TextW(back, ls) + pad * 2.0f, kit::TextH(ls) + pad * 2.0f};
+            TouchButton(ui, m_backRect, back, kit::Dim(a), ls, a);
+        }
         switch (m_face) {
             case Back: {
                 const std::string play = menu::MainLabel(menu::MainItem::Play, fl);
@@ -845,7 +929,7 @@ private:
                     if (sel) ui.AddRect(UiRect{r.x, r.y + r.height + ls * 2.0f, r.width, static_cast<float>(ls)}, kit::Beam(a));
                     m_rects.push_back(r);
                 }
-                kit::Hint(ui, "ARROWS  CROSS AN EDGE     ENTER  ACCEPT     ESC  ONE DIMENSION DOWN", a);
+                kit::Hint(ui, touch ? "TAP A SIDE TO CROSS ITS EDGE" : "ARROWS  CROSS AN EDGE     ENTER  ACCEPT     ESC  ONE DIMENSION DOWN", a);
                 break;
             }
             case Floor: {
@@ -854,7 +938,7 @@ private:
                 rows.push_back({fl.HasProgress() ? "CONTINUE" : "START", "LEVEL " + menu::LevelName(fl, fl.ContinueLevel()), true});
                 if (fl.HasProgress()) rows.push_back({"FROM THE BEGINNING", "LEVEL 01", true});
                 Rows(ui, vp, Floor, rows, a);
-                kit::Hint(ui, "ENTER  ENTER THE LEVEL     ESC  BACK ACROSS THE EDGE", a);
+                kit::Hint(ui, touch ? "TAP  ENTER THE LEVEL" : "ENTER  ENTER THE LEVEL     ESC  BACK ACROSS THE EDGE", a);
                 break;
             }
             case Left: {
@@ -867,9 +951,14 @@ private:
                     rows.push_back({"LEVEL " + menu::LevelName(fl, i), fl.Solved(i) ? "SOLVED" : fl.Unlocked(i) ? "NEW" : "LOCKED",
                                     fl.Unlocked(i)});
                 Rows(ui, vp, Left, rows, a);
-                kit::Hint(ui, fl.levelCount > kRowsPerPage ? "UP/DOWN  CHOOSE     <- ->  PAGE     ENTER  PLAY     ESC  BACK ACROSS THE EDGE"
-                                                           : "UP/DOWN  CHOOSE     ENTER  PLAY     ESC  BACK ACROSS THE EDGE",
-                          a);
+                if (touch) {
+                    if (fl.levelCount > kRowsPerPage) PageArrows(ui, first > 0, last < fl.levelCount, ls, a);
+                    kit::Hint(ui, fl.levelCount > kRowsPerPage ? "TAP  PLAY     SWIPE  PAGE" : "TAP  PLAY", a);
+                } else {
+                    kit::Hint(ui, fl.levelCount > kRowsPerPage ? "UP/DOWN  CHOOSE     <- ->  PAGE     ENTER  PLAY     ESC  BACK ACROSS THE EDGE"
+                                                               : "UP/DOWN  CHOOSE     ENTER  PLAY     ESC  BACK ACROSS THE EDGE",
+                              a);
+                }
                 break;
             }
             case Right: {
@@ -877,7 +966,7 @@ private:
                 std::vector<Row> rows;
                 for (int i = 0; i < menu::kOptionCount; ++i) rows.push_back({menu::OptionLabel(i), menu::OptionValue(i, fl, m_options), true});
                 Rows(ui, vp, Right, rows, a);
-                kit::Hint(ui, "UP/DOWN  CHOOSE     <- ->  CHANGE     ESC  BACK ACROSS THE EDGE", a);
+                kit::Hint(ui, touch ? "TAP OR SWIPE A ROW  CHANGE" : "UP/DOWN  CHOOSE     <- ->  CHANGE     ESC  BACK ACROSS THE EDGE", a);
                 break;
             }
             case Ceiling: {
@@ -892,7 +981,7 @@ private:
                     const bool head = i == 0 || lines[i - 1].empty();
                     kit::TextCentered(ui, x, y, lines[i], head ? kit::White(a) : kit::Dim(a), ls);
                 }
-                kit::Hint(ui, "ESC / ENTER  BACK ACROSS THE EDGE", a);
+                kit::Hint(ui, touch ? "TAP  BACK ACROSS THE EDGE" : "ESC / ENTER  BACK ACROSS THE EDGE", a);
                 break;
             }
             default: break;
@@ -900,6 +989,31 @@ private:
     }
 
     static std::string play_label(const GameFlow& fl) { return menu::MainLabel(menu::MainItem::Play, fl); }
+
+    // Un boton para el dedo: velo, borde y texto centrado. El borde se
+    // enciende mientras el dedo esta apoyado encima.
+    void TouchButton(UiDrawList& ui, const UiRect& r, const std::string& text, const UiColor& c, int scale, float a = 1.0f) {
+        const bool on = m_touch.down && kit::Inside(r, m_touch.startX, m_touch.startY, 8.0f) &&
+                        kit::Inside(r, InputService::Actions().CursorX(), InputService::Actions().CursorY(), 8.0f);
+        ui.AddRect(r, kit::Black((on ? 0.9f : 0.6f) * a));
+        ui.AddRectOutline(r, on ? kit::Beam(a) : kit::Mix(kit::Faint(a), c, 0.5f), on ? 2.0f : 1.0f);
+        ui.AddTextCentered(r, text, on ? kit::White(a) : c, scale);
+    }
+
+    // Las flechas de pagina de NIVELES, a los costados de la pantalla y a
+    // media altura: lo mismo que barrer, para quien no sabe que se puede.
+    void PageArrows(UiDrawList& ui, bool hasPrev, bool hasNext, int scale, float a) {
+        const float W = UiService::Width(), H = UiService::Height();
+        const float w = std::floor(H * 0.11f), h = std::floor(H * 0.18f), m = std::floor(H * 0.03f);
+        if (hasPrev) {
+            m_prevRect = UiRect{m, std::floor(H * 0.5f - h * 0.5f), w, h};
+            TouchButton(ui, m_prevRect, "<", kit::Dim(a), scale + 1, a);
+        }
+        if (hasNext) {
+            m_nextRect = UiRect{std::floor(W - m - w), std::floor(H * 0.5f - h * 0.5f), w, h};
+            TouchButton(ui, m_nextRect, ">", kit::Dim(a), scale + 1, a);
+        }
+    }
 
     void Header(UiDrawList& ui, const DirectX::XMMATRIX& vp, int f, const std::string& text, float a) {
         float x, y;
@@ -990,6 +1104,9 @@ private:
     Pose m_camFrom;
 
     std::vector<UiRect> m_rects;
+    // Con el dedo: los botones que no son filas (vacios si no se dibujaron).
+    TouchGesture m_touch;
+    UiRect m_backRect, m_quitRect, m_prevRect, m_nextRect;
     menu::OptionsState m_options;
     float m_time = 0.0f, m_phaseTime = 0.0f, m_dt = 0.0f, m_toast = 0.0f;
     std::string m_toastText;

@@ -41,11 +41,37 @@ inline UiColor Mix(const UiColor& a, const UiColor& b, float t) {
     return UiColor::Rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t);
 }
 
+// Se juega con el dedo: siempre en Android, y en PC con GRAV_TOUCH=1 (el raton
+// hace de dedo, para probarlo en el Editor). Ver Flow/Touch.h, que es donde se
+// usa; vive aca porque el tamano del texto tambien depende de esto.
+inline bool TouchMode() {
+#if defined(__ANDROID__)
+    return true;
+#elif defined(_MSC_VER)
+    static const bool on = [] {
+        char buf[8] = {};
+        size_t len = 0;
+        return getenv_s(&len, buf, sizeof(buf), "GRAV_TOUCH") == 0 && len > 0 && buf[0] == '1';
+    }();
+    return on;
+#else
+    static const bool on = [] {
+        const char* v = std::getenv("GRAV_TOUCH");
+        return v && v[0] == '1';
+    }();
+    return on;
+#endif
+}
+
 // La escala base del texto: 1 por cada 240 filas (720p = 3, 1080p = 4 con
 // redondeo hacia abajo... 4,5 -> 4). Un `big` mas para titulos.
+//
+// Con el dedo, un escalon mas: la pantalla de un telefono mide la quinta parte
+// que un monitor con las mismas filas, y a 1/38 del alto la letra queda en un
+// milimetro y medio.
 inline int TextScale(float extra = 0.0f) {
     const float h = UiService::Height();
-    return std::max(1, static_cast<int>(std::floor(h / 240.0f + extra)));
+    return std::max(1, static_cast<int>(std::floor(h / 240.0f + extra)) + (TouchMode() ? 1 : 0));
 }
 inline float TextW(std::string_view t, int s) { return static_cast<float>(MeasureTextWidth(t, s)); }
 inline float TextH(int s) { return static_cast<float>(kGlyphHeight * s); }
