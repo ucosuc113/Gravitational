@@ -15,7 +15,7 @@
 ;      posturas distintas: una sobre un piso y otra sobre una pared.
 title THE FOLD
 hint EACH PLANE IS A DIMENSION. LIGHT CROSSES FROM ONE TO ANOTHER AT THEIR EDGES
-rules 3
+rules 4
 size 8 6 5
 ; la salida: una franja baja
 start floor 0 0 0 3 0 1

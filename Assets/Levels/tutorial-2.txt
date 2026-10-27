@@ -1,5 +1,5 @@
 title FLOOR AND CEILING
-rules 3
+rules 4
 ; NIVEL 3 - del piso al techo, con un cubo (lo hizo la IA como prueba).
 ;
 ; El puente sube en vertical, y la pieza del medio es un cubo: su franja tiene

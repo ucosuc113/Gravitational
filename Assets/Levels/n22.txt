@@ -15,7 +15,7 @@
 ; que hay que doblar despues.
 title GRAVITY
 hint THE WORMHOLE CHOOSES WHERE TO COME OUT. THE HOLES, WHERE NOT
-rules 3
+rules 4
 size 16 11 8
 start floor 0 0 0 3 0 2
 source 0 0 1 right

@@ -13,7 +13,7 @@
 ; segunda piramide tiene que estar en esa fila.
 title THE PIT
 hint WHAT FALLS INTO ONE PIT COMES OUT OF THE OTHER, IN ANOTHER DIMENSION
-rules 3
+rules 4
 size 8 6 4
 start floor 0 0 0 2 0 3
 source 0 0 3 front

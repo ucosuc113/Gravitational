@@ -98,18 +98,25 @@ inline std::vector<Violation> CheckTrace(const Board& b, const Trace& t) {
         // --- por-debajo, al SALIR: de una pieza apoyada en una cara entera al
         // plano por el centro de esa cara (la luz cruzo por debajo) ---
         if (p.kind == Hop::Kind::Figure && !p.toSeam && q.kind == Hop::Kind::Plane && !q.fromEdge) {
-            const Figure* f = b.FigureAt(q.from);
+            // De cualquiera de los dos lados del plano (reglas 4): la pieza que
+            // sale puede estar apoyada en su reves.
             const Int3 n = b.planes[static_cast<size_t>(q.plane)].normal;
-            if (f && b.IndexAt(q.from) == b.IndexAt(p.cell) && ContactOf(*f, n) == Contact::Full)
+            const bool back = b.IndexAt(q.from) != b.IndexAt(p.cell);
+            const Int3 c = back ? q.from + n : q.from;
+            const Figure* f = b.InBox(c) ? b.FigureAt(c) : nullptr;
+            if (f && b.IndexAt(c) == b.IndexAt(p.cell) && ContactOf(*f, back ? -n : n) == Contact::Full)
                 out.push_back({"por-debajo", std::string(Info(f->shape).key) + " " + at(p.cell) + " (sale por la cara apoyada)"});
         }
 
         // --- por-debajo y frena-debajo, al ENTRAR ---
         if (p.kind != Hop::Kind::Plane || q.kind != Hop::Kind::Figure || q.fromSeam) continue;
+        // La cara de entrada es la que toca el plano, de su lado declarado (n) o
+        // del reves (-n, reglas 4).
         const Int3 n = b.planes[static_cast<size_t>(p.plane)].normal;
         const Figure* f = b.PortAt(q.cell, q.nIn);
-        if (!f || q.nIn != n) continue;
-        const Contact c = ContactOf(*f, n);
+        if (!f || (q.nIn != n && q.nIn != -n)) continue;
+        if (q.nIn == -n && q.cell != p.to + n) continue;
+        const Contact c = ContactOf(*f, q.nIn);
         const bool stops = i + 2 == t.hops.size() && t.end == TraceEnd::Blocked;
         if (c == Contact::Full) out.push_back({"por-debajo", std::string(Info(f->shape).key) + " " + at(q.cell) + (stops ? " (y se frena ahi)" : " (y sigue)")});
         else if (c == Contact::Tangent && stops) out.push_back({"frena-debajo", std::string(Info(f->shape).key) + " " + at(q.cell)});

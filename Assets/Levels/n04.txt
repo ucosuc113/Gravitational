@@ -4,7 +4,7 @@
 ; (candidato 4: 5 piezas, 7 tramos de luz). Ver docs/niveles.md.
 title BIG SPHERE
 hint A SIZE 3 SPHERE ONLY TOUCHES AT THE CENTER OF ITS FACES
-rules 3
+rules 4
 start floor
 end ceiling
 size 5 5 4

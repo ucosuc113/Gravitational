@@ -13,7 +13,7 @@
 ; se levanta la llegada. Cuatro planos, cuatro piezas, una por plano.
 title THE RIBBON
 hint THE SPHERE TURNS LIGHT. THE TWIST MOVES IT TO ANOTHER PLANE AND LETS IT GO ON
-rules 3
+rules 4
 size 10 6 6
 start floor 0 0 0 3 0 1
 source 0 0 1 right

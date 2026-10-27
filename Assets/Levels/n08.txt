@@ -14,7 +14,7 @@
 ; DONDE doblar, y cada sitio pide las piramides en otra postura.
 title THE WAVE
 hint THE RAMP LIFTS LIGHT FROM THE FLOOR TO A WALL THAT DOES NOT TOUCH IT
-rules 3
+rules 4
 size 10 8 5
 start floor 0 0 0 3 0 1
 source 0 0 1 right

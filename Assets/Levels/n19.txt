@@ -17,7 +17,7 @@
 ; en la de al lado: la ultima piramide, de punta contra ella.
 title THE BRIDGE
 hint TO GO FORWARD, SOMETIMES YOU HAVE TO GO BACK
-rules 3
+rules 4
 size 12 8 7
 start floor 8 0 1 10 0 3
 source 8 0 2 right
@@ -25,7 +25,10 @@ panel ceiling 1 2 0 10 2 5
 fixed blackhole 5 2 2 down
 ; La fila 4 del primer puente (la otra salida del cubo colgado) cae aca.
 fixed blackhole 9 2 4 down
-panel right 0 2 0 0 3 5
+; La pared corta va SOLO por encima del puente (reglas 4, 27/10/2026): con
+; planos de dos caras, una pared que cruzara el puente seria una esquina concava
+; tambien por debajo, y la luz bajaria por ella en vez de subir.
+panel right 0 3 0 0 3 5
 panel floor 1 4 0 7 4 5
 ; Al pie de la llegada, en el piso de en medio: sin estos, una esfera de 3 ahi
 ; mismo sube la luz al segundo puente justo en su esquina con la llegada.

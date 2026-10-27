@@ -12,7 +12,7 @@
 ; a dos paredes colgadas: la ultima es la llegada.
 title RIBBON ROAD
 hint RIBBONS CHANGE PLANES. EACH ONE DOES IT ITS OWN WAY
-rules 3
+rules 4
 size 10 14 9
 start floor 0 0 0 3 0 2
 source 0 0 2 front

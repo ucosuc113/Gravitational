@@ -1,6 +1,6 @@
 title SPHERE BRIDGE
 hint LIGHT CROSSES FROM ONE SURFACE TO ANOTHER WHERE THEY TOUCH
-rules 3
+rules 4
 ; NIVEL 1 - TUTORIAL: tres esferas (lo hizo la IA; los niveles de verdad los
 ; disena la persona). Ver docs/reglas.md.
 ;

@@ -17,7 +17,7 @@
 ; piramide de punta la sube por la llegada.
 title WHAT COMES BACK
 hint THE WHITE HOLE SENDS LIGHT BACK. THE WAY BACK NEED NOT BE THE WAY THERE
-rules 3
+rules 4
 size 10 7 5
 start floor 3 0 2 4 0 2
 source 3 0 2 right

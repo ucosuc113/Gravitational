@@ -14,7 +14,7 @@
 ; bajar por la llegada hasta el receptor, que esta en su rincon de abajo.
 title THE ECLIPSE
 hint THE BIGGER THE SPHERE, THE FARTHER IT REACHES
-rules 3
+rules 4
 size 9 10 12
 start floor 0 0 0 6 0 5
 source 0 0 0 back

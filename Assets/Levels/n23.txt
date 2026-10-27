@@ -15,7 +15,7 @@
 ; plan quedo afuera a cambio del agujero blanco y los dos gusanos.
 title SINGULARITY
 hint EVERYTHING YOU LEARNED, ONCE
-rules 3
+rules 4
 size 16 12 16
 start floor 3 0 1 4 0 1
 source 3 0 1 right

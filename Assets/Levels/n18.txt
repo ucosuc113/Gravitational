@@ -14,7 +14,7 @@
 ; borde, y el receptor esta en su rincon: una piramide mas.
 title THE TOWER
 hint PIECES CAN ALSO PASS THE LIGHT TO EACH OTHER
-rules 3
+rules 4
 size 8 13 9
 start floor 0 0 2 2 0 4
 source 0 0 3 right
@@ -36,10 +36,12 @@ inventory pyramid 3 sphere 2 cube 2 torus 2 prism 1
 ; La solucion, para las pruebas (TraceCheck y Tools/LevelLab):
 ;! place sphere 3 4 3
 ;! place torus 3 6 3 x
-;! place cube 3 7 3 z
+;! place cube 3 7 3 -z
+; (los dos cubos cambiaron de sentido con las reglas 4: su tapa esta pegada al
+; reves del estante de arriba, y la luz baja a el por esa arista - D1)
 ;! place pyramid 1 8 3 down
 ;! place pyramid 1 8 6 down
 ;! place sphere 4 8 6
 ;! place torus 4 9 6 x
-;! place cube 4 10 6 -z
+;! place cube 4 10 6 z
 ;! place pyramid 7 12 6 left

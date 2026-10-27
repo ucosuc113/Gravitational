@@ -72,9 +72,14 @@ inline bool PickAt(const Board& b, const strace::GameObject& cam, const strace::
         for (size_t i = 0; i < planes.size() && i < b.planes.size(); ++i)
             if (planes[i] && planes[i] == hit.object) plane = static_cast<int>(i);
         if (plane >= 0) {
-            // Del punto del plano (en el borde de la caja) a la celda de la
-            // capa pegada a el: medio paso hacia adentro.
-            const Int3 n = b.planes[static_cast<size_t>(plane)].normal;
+            // Del punto del plano a la celda de la capa pegada a el, medio paso
+            // hacia el lado DESDE EL QUE SE MIRA. Un plano tiene dos caras
+            // (reglas 4): mirado desde su reves, la pieza va del reves, y la luz
+            // la toca igual. Antes caia siempre del lado declarado, o sea detras
+            // del plano que se estaba tocando.
+            const Int3 declared = b.planes[static_cast<size_t>(plane)].normal;
+            const float facing = ray.direction.x * declared.x + ray.direction.y * declared.y + ray.direction.z * declared.z;
+            const Int3 n = facing >= 0.0f ? declared : -declared;
             out.cell = CellAt(b, point - ToF(n) * 0.5f);
             out.normal = -n;
             out.canPlace = b.InBox(out.cell) && !b.FigureAt(out.cell);

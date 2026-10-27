@@ -259,16 +259,43 @@ public:
         return InBox(c) && c.x >= f.lo.x && c.x <= f.hi.x && c.y >= f.lo.y && c.y <= f.hi.y && c.z >= f.lo.z && c.z <= f.hi.z;
     }
 
-    // El plano (0 o 1) sobre la cara con esa normal que cubre esa celda, o -1.
-    int PlaneOn(const Int3& normal, const Int3& cell) const {
+    // El plano declarado EN esa cara de esa celda (de su lado), o -1. Solo para
+    // lo que de verdad tiene un lado: el pozo de un gusano se hunde en el plano
+    // desde la cara donde se declaro el portal.
+    int PlaneOnSide(const Int3& normal, const Int3& cell) const {
         for (size_t i = 0; i < planes.size(); ++i)
             if (planes[i].normal == normal && InPlane(cell, planes[i])) return static_cast<int>(i);
         return -1;
     }
 
+    // El plano que pasa por la cara `normal` de la celda, de CUALQUIERA de sus
+    // dos lados, o -1. `home`, si se pide, es la celda del lado declarado (la
+    // de su rectangulo): ahi viven sus casillas, sus tramos y su dibujo.
+    //
+    // LOS PLANOS TIENEN DOS CARAS (reglas 4, 27/10/2026). Un plano flota, y su
+    // dibujo muestra la luz de los dos lados, pero hasta aca la luz solo corria
+    // del lado de sus celdas: una pieza puesta del otro lado no lo tocaba nunca.
+    // El nivel 11 era imposible por eso - la luz daba la vuelta por el techo del
+    // sandwich de abajo y quedaba DEBAJO de el, y lo que se pusiera encima, que
+    // es donde estaba la salida, no la veia. Ahora un plano es la misma
+    // superficie de los dos lados: la cara de una celda pegada a su revés esta
+    // pegada al plano, y la luz que corre por el toca lo que tenga de cualquier
+    // lado (ver `meet` en TraceLight).
+    int PlaneOn(const Int3& normal, const Int3& cell, Int3* home = nullptr) const {
+        const int p = PlaneOnSide(normal, cell);
+        if (p >= 0) {
+            if (home) *home = cell;
+            return p;
+        }
+        const Int3 other = cell + normal; // la celda del otro lado de esa cara
+        const int q = PlaneOnSide(-normal, other);
+        if (q >= 0 && home) *home = other;
+        return q;
+    }
+
     // ¿La cara `normal` de la celda es un plano de portal? (donde puede ir un pozo)
     bool PortalAt(const Int3& normal, const Int3& cell) const {
-        const int p = PlaneOn(normal, cell);
+        const int p = PlaneOnSide(normal, cell);
         return p >= 0 && planes[static_cast<size_t>(p)].portal;
     }
 
@@ -709,9 +736,17 @@ public:
         for (size_t i = 1; i < b.planes.size(); ++i)
             for (size_t j = 0; j < i; ++j) {
                 const Face &p = b.planes[i], &q = b.planes[j];
-                if (p.normal != q.normal) continue;
-                if (p.lo.x <= q.hi.x && q.lo.x <= p.hi.x && p.lo.y <= q.hi.y && q.lo.y <= p.hi.y && p.lo.z <= q.hi.z && q.lo.z <= p.hi.z) {
-                    error = "dos planos se superponen (misma normal, mismas celdas)";
+                // Con dos caras (reglas 4), tambien de lados opuestos: el techo
+                // de una capa y el piso de la de arriba son la MISMA superficie.
+                Int3 qlo = q.lo, qhi = q.hi;
+                if (p.normal == -q.normal) {
+                    qlo = q.lo + q.normal;
+                    qhi = q.hi + q.normal;
+                } else if (p.normal != q.normal) {
+                    continue;
+                }
+                if (p.lo.x <= qhi.x && qlo.x <= p.hi.x && p.lo.y <= qhi.y && qlo.y <= p.hi.y && p.lo.z <= qhi.z && qlo.z <= p.hi.z) {
+                    error = "dos planos se superponen (la misma superficie, de un lado o del otro)";
                     return false;
                 }
             }

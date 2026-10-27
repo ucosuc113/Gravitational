@@ -14,7 +14,7 @@
 ; llegada. Dos curvas: la que sube doblando, y la piramide que dobla subiendo.
 title TO THE LEFT
 hint A WALL ALONE LIFTS LIGHT STRAIGHT UP. THE CURVE LIFTS IT WHILE TURNING
-rules 3
+rules 4
 size 6 9 13
 start floor 0 0 0 3 0 1
 source 0 0 0 right

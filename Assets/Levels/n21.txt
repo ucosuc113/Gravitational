@@ -15,7 +15,7 @@
 ; otro lado). Arriba de todo, la llegada se levanta en el borde del ultimo.
 title THE SPIRAL
 hint CLIMB AND TURN, CLIMB AND TURN
-rules 3
+rules 4
 size 12 10 12
 start floor 0 0 0 3 0 3
 source 1 0 3 front

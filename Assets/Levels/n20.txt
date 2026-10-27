@@ -17,7 +17,7 @@
 ; cubo la sube al receptor.
 title FRONT TO BACK
 hint THE ACCORDION FOLDS BY ITSELF. WHAT IS LEFT IS CHOOSING THE ROW
-rules 3
+rules 4
 size 6 9 16
 start floor 1 0 0 4 0 2
 source 2 0 0 back

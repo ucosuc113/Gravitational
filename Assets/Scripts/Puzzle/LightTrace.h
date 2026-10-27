@@ -185,7 +185,10 @@ inline bool SeamAt(const Board& b, const Int3& cell, const Int3& face, const Int
 //   2  24/10/2026: el modelo de superficie, D1-D4 (abajo)
 //   3  24/10/2026: planos FLOTANTES (Board.h: Face) - en cualquier lugar de la
 //      caja; la luz pasa de uno a otro por aristas concavas, a ras y convexas
-inline constexpr int kRulesVersion = 3;
+//   4  27/10/2026: los planos tienen DOS CARAS (Board::PlaneOn). La luz que
+//      corre por un plano toca lo que este de cualquiera de sus lados, y sube
+//      por una pared que se le cruce de cualquier lado
+inline constexpr int kRulesVersion = 4;
 
 // Como toca una pieza al plano sobre el que esta, por la cara `planeNormal`
 // de su celda. Es lo que decide que hace la luz que llega por ese plano:
@@ -674,7 +677,11 @@ inline Trace TraceLight(const Board& b) {
         // Primero el PLANO: si esa cara de la celda es parte de uno, la luz cae
         // en el (un plano flotante puede estar entre dos celdas de la caja, y lo
         // que haya del otro lado queda detras de el). Si no, una pieza vecina.
-        const int p = b.PlaneOn(e.normal, e.cell);
+        // `home`: la celda del lado declarado del plano. Una pieza del otro lado
+        // (reglas 4) le devuelve la luz desde su reves, pero la luz corre por
+        // las casillas del plano, que son una sola de los dos lados.
+        Int3 home;
+        const int p = b.PlaneOn(e.normal, e.cell, &home);
         if (p < 0) {
             if (!b.InBox(q) || !b.PortAt(q, -e.normal)) return 0;
             if (pieceUsed(q)) return 2;
@@ -685,10 +692,10 @@ inline Trace TraceLight(const Board& b) {
             entryPlane = -1;
             return 1;
         }
-        if (visited(p, e.cell) && !(p == entryPlane && e.cell == entryCell)) return 2;
+        if (visited(p, home) && !(p == entryPlane && home == entryCell)) return 2;
         onPlane = true;
         plane = p;
-        at = e.cell; // la celda de la capa: el contacto es su cara hacia el plano
+        at = home; // la celda de la capa: el contacto es su cara hacia el plano
         dir = e.dir;
         justLanded = true;
         viaEdge = e.atEdge; // por la arista de un cubo: el tramo empieza en el borde
@@ -731,15 +738,28 @@ inline Trace TraceLight(const Board& b) {
             //   - una pieza por la que la luz ya paso (D4): se frena en su borde.
             // El tramo que se frena en el borde termina en la arista de la celda
             // de antes, como el que sube.
+            //
+            // DE LOS DOS LADOS (reglas 4): primero la pieza del lado declarado
+            // del plano (la celda `p`), y si no hay, la del reves (la celda de
+            // enfrente, tocando con su cara `-normal`). Para la pieza es lo mismo
+            // - una cara o un punto apoyado en una superficie -, solo que el
+            // "arriba" de su lado es el contrario: todo lo de abajo usa `cn`, la
+            // cara de la pieza que toca el plano, y nunca face.normal.
             auto meet = [&](const Int3& p) {
+                Int3 pc = p, cn = face.normal;
                 const Figure* f = b.PortAt(p, face.normal);
+                if (!f) {
+                    pc = p + face.normal;
+                    cn = -face.normal;
+                    f = b.InBox(pc) ? b.PortAt(pc, cn) : nullptr;
+                }
                 if (!f) return 0;
                 Int3 n2, t2;
-                bool stop = pieceUsed(p);
-                const bool climbs = !stop && ClimbsOnto(*f, face.normal, dir, n2, t2);
+                bool stop = pieceUsed(pc);
+                const bool climbs = !stop && ClimbsOnto(*f, cn, dir, n2, t2);
                 if (!climbs && !stop)
-                    stop = ContactOf(*f, face.normal) == Contact::Full ||
-                           (f->shape != Shape::Wormhole && TransferOf(b, *f, p, face.normal, dir).blocked);
+                    stop = ContactOf(*f, cn) == Contact::Full ||
+                           (f->shape != Shape::Wormhole && TransferOf(b, *f, pc, cn, dir).blocked);
                 if (climbs || stop) {
                     // Si llego por una arista justo a esta celda, no hay tramo de plano.
                     if (!(p == h.from && h.fromEdge)) {
@@ -751,15 +771,15 @@ inline Trace TraceLight(const Board& b) {
                         tr.end = TraceEnd::Blocked;
                         return 2;
                     }
-                    cell = p;
+                    cell = pc;
                     nIn = n2;
                     t = t2;
                     seamIn = true;
                 } else {
                     h.to = p;
                     tr.hops.push_back(h);
-                    cell = p;
-                    nIn = face.normal;
+                    cell = pc;
+                    nIn = cn;
                     t = dir;
                     seamIn = false;
                 }
@@ -788,19 +808,30 @@ inline Trace TraceLight(const Board& b) {
                 //   - CONVEXA: este se acabo y otro cuelga de su borde, del lado
                 //     de afuera: la luz da la vuelta y baja por el.
                 // Si no, se pierde en el borde: lo que no es plano es vacio.
+                //
+                // Con dos caras (reglas 4), cada busqueda encuentra el plano de
+                // cualquiera de sus lados (`at2` queda en su lado declarado), y
+                // la pared CONCAVA puede levantarse tambien del reves: si del
+                // lado declarado no hay, una que cruce por debajo lleva la luz
+                // hacia ese lado.
                 const Int3 next = pos + dir;
                 int other = -1;
                 Int3 at2 = pos, dir2 = dir;
-                const int wall = b.PlaneOn(dir, pos);
+                const Int3 under = pos + face.normal;
+                int wall = b.PlaneOn(dir, pos, &at2);
+                dir2 = -face.normal;
+                if (!(wall >= 0 && wall != plane) && b.InBox(under)) {
+                    wall = b.PlaneOn(dir, under, &at2);
+                    dir2 = face.normal;
+                }
                 if (wall >= 0 && wall != plane) {
                     other = wall;
-                    dir2 = -face.normal;
                 } else if (!b.InPlane(next, face)) {
-                    other = b.PlaneOn(face.normal, next);
-                    at2 = next;
+                    dir2 = dir;
+                    other = b.PlaneOn(face.normal, next, &at2);
                     if (other < 0) {
-                        at2 = next + face.normal;
-                        other = b.InBox(at2) ? b.PlaneOn(-dir, at2) : -1;
+                        const Int3 hang = next + face.normal;
+                        other = b.InBox(hang) ? b.PlaneOn(-dir, hang, &at2) : -1;
                         dir2 = face.normal;
                     }
                     if (other < 0) {

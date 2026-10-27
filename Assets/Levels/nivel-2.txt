@@ -1,6 +1,6 @@
 title FLOOR TO WALL
 hint THE CUBE ONLY CONDUCTS ALONG ITS BAND: ROTATE IT
-rules 3
+rules 4
 ; NIVEL 2 - del piso a la pared, separados por aire (pedido para depurar: la
 ; salida horizontal y lejos, la llegada vertical). Lo hizo la IA.
 ;

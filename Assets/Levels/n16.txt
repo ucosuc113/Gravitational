@@ -9,7 +9,7 @@
 ; enfrente: una ESFERA en la ultima casilla le pasa la luz de costado.
 title FOUR HEIGHTS
 hint EACH HEIGHT IS REACHED A DIFFERENT WAY
-rules 3
+rules 4
 size 9 9 9
 start floor 0 0 0 3 0 2
 source 0 0 1 right

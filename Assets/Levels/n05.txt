@@ -4,7 +4,7 @@
 ; (candidato 1: 5 piezas, 7 tramos de luz). Ver docs/niveles.md.
 title THE BAND SPINS
 hint THE CUBE TURNS LIGHT THAT TRAVELS ALONG ITS AXIS: WATCH WHERE ITS ARROWS SPIN
-rules 3
+rules 4
 start left
 end right
 size 4 4 4

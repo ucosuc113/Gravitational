@@ -12,7 +12,7 @@
 ; la devuelve hacia atras hasta la llegada.
 title THE RING
 hint THE TORUS ONLY CONDUCTS AROUND ITS RING: IT HAS NO SIDES
-rules 3
+rules 4
 size 9 7 5
 start floor 2 0 1 8 0 1
 source 2 0 1 right
